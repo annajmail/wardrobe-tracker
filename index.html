@@ -13,509 +13,418 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'DM Sans',sans-serif;background:#FAF5F0;color:#3D2E1F;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
-::-webkit-scrollbar{width:4px}
-::-webkit-scrollbar-thumb{background:#E8DDD0;border-radius:4px}
+body{font-family:'DM Sans',sans-serif;background:#FAF5F0;color:#3D2E1F;-webkit-tap-highlight-color:transparent}
+button,select,input{font-family:'DM Sans',sans-serif;font-size:13px}
+.hdr{background:linear-gradient(135deg,#C4704B,#D4A574);padding:20px 18px 14px;border-radius:0 0 20px 20px}
+.hdr h1{margin:0;font-size:19px;font-weight:700;color:#fff;font-family:'Playfair Display',serif}
+.hdr p{margin:2px 0 0;font-size:11px;color:rgba(255,255,255,0.8)}
+.tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid #E8DDD0}
+.tb{padding:10px 14px;border:none;border-bottom:3px solid transparent;background:none;color:#8A7968;font-weight:500;cursor:pointer;white-space:nowrap}
+.tb.on{color:#C4704B;font-weight:700;border-bottom-color:#C4704B}
+.cn{display:inline-block;background:#E8DDD0;color:#8A7968;border-radius:10px;padding:0 6px;font-size:10px;font-weight:600;margin-left:4px}
+.tb.on .cn{background:#E8A889;color:#C4704B}
+.wrap{padding:16px;max-width:800px;margin:0 auto}
+.cd{background:#fff;border-radius:14px;padding:14px;border:1px solid #E8DDD0;margin-bottom:10px}
+.row{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:10px 12px;border:1px solid #E8DDD0;margin-bottom:5px}
+.nm{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sm{font-size:10px;color:#8A7968}
+.bg{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.bg-k{background:rgba(139,158,126,0.13);color:#8B9E7E;border:1px solid rgba(139,158,126,0.27)}
+.bg-d{background:rgba(196,112,75,0.13);color:#C4704B;border:1px solid rgba(196,112,75,0.27)}
+.bg-m{background:rgba(212,165,116,0.13);color:#D4A574;border:1px solid rgba(212,165,116,0.27)}
+.bg-w{background:rgba(91,123,165,0.13);color:#5B7BA5}
+.bg-c{background:rgba(139,158,126,0.13);color:#8B9E7E}
+.ip{padding:9px 12px;border:1px solid #E8DDD0;border-radius:10px;color:#3D2E1F;background:#FAF5F0;outline:none;width:100%;box-sizing:border-box}
+.bt{padding:9px 16px;border:none;border-radius:10px;font-weight:600;cursor:pointer}
+.ba{background:#C4704B;color:#fff}
+.bs{background:#8B9E7E;color:#fff}
+.sm-b{width:30px;height:30px;border:1px solid #E8DDD0;border-radius:8px;background:#FAF5F0;cursor:pointer;font-size:13px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.pl{padding:4px 9px;border:2px solid #E8DDD0;border-radius:16px;background:#FAF5F0;font-size:11px;cursor:pointer;color:#3D2E1F}
+.pl.on{border-color:#C4704B;background:rgba(196,112,75,0.08);font-weight:600;color:#C4704B}
+.gh{background:transparent;border:1px solid #E8DDD0;color:#8A7968;border-radius:18px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer}
+.gh.on{border-color:#C4704B;background:rgba(196,112,75,0.08);color:#C4704B}
+.oc{padding:12px;background:#FAF5F0;border-radius:10px;border:1px solid #E8DDD0;margin-bottom:8px}
+.ot{padding:2px 7px;background:#fff;border-radius:6px;font-size:10px;color:#3D2E1F;border:1px solid #E8DDD0;display:inline-block;margin:2px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fw{display:flex;flex-wrap:wrap;gap:8px}
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.12.7/Recharts.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
-<script type="text/babel">
-const {useState,useEffect,useReducer,useCallback} = React;
-const {BarChart,Bar,PieChart,Pie,Cell,XAxis,YAxis,Tooltip,ResponsiveContainer,Legend} = Recharts;
+<div id="app">Loading...</div>
+<script>
+(function(){
 
-// ─── Storage helpers ───
-const storage = {
-  get(key) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e) { return null; } },
-  set(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch(e) { return false; } },
-  remove(key) { try { localStorage.removeItem(key); return true; } catch(e) { return false; } }
-};
-
-// ─── Data ───
-const REAL_ITEMS = [
-  {name:"Black L.L. Bean tank",category:"Tops",subcategory:"Tanks",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"White L.L. Bean tank",category:"Tops",subcategory:"Tanks",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Lane Bryant tank",category:"Tops",subcategory:"Tanks",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Black Torrid t-shirt",category:"Tops",subcategory:"T-Shirts",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Black Old Navy t-shirt",category:"Tops",subcategory:"T-Shirts",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Black Torrid short sleeve sweater t-shirt",category:"Tops",subcategory:"T-Shirts",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"White L.L. Bean t-shirt",category:"Tops",subcategory:"T-Shirts",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"White Torrid t-shirt",category:"Tops",subcategory:"T-Shirts",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Cream colored t-shirt",category:"Tops",subcategory:"T-Shirts",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Green/mint L.L. Bean t-shirt",category:"Tops",subcategory:"T-Shirts",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Long sleeve light blue chambray button up",category:"Tops",subcategory:"Button Ups",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Short sleeve chambray button up",category:"Tops",subcategory:"Button Ups",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Dark thick Amazon brown plaid button up",category:"Tops",subcategory:"Button Ups",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Light brown and gray flannel button up",category:"Tops",subcategory:"Button Ups",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Buffalo plaid button up",category:"Tops",subcategory:"Button Ups",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Dark green plaid button up",category:"Tops",subcategory:"Button Ups",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Black long sleeve scoop Good American shirt",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Black Torrid v-neck long sleeve",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Amazon lightweight black sweater",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Black 3/4 sleeve scallop sweater",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"V-neck black Torrid sweater",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Amazon lightweight gray sweater",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Amazon v-neck brown sweater",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Very fuzzy L.L. Bean cream pullover",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"V-neck cream Old Navy sweater",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Gray long sleeve sweater with bronze buttons",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Torrid soft blue and white striped sweater",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Navy blue Inspire crew neck sweater",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Green We Wander dark green long sleeve",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Corduroy pullover",category:"Tops",subcategory:"Sweaters & LS",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"White blouse",category:"Tops",subcategory:"Blouses",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Dark green blouse",category:"Tops",subcategory:"Blouses",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Torrid black blazer",category:"Outerwear",subcategory:"Blazers",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Tan blazer",category:"Outerwear",subcategory:"Blazers",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Purple blazer",category:"Outerwear",subcategory:"Blazers",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Teal blazer",category:"Outerwear",subcategory:"Blazers",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"White Inspire half zip",category:"Tops",subcategory:"Sweatshirts",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Navy blue Inspire zip up jacket",category:"Tops",subcategory:"Sweatshirts",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Teal L.L. Bean pullover sweatshirt",category:"Tops",subcategory:"Sweatshirts",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Torrid cropped gray dress pants",category:"Bottoms",subcategory:"Pants",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Dark wash Torrid skinny jeans",category:"Bottoms",subcategory:"Jeans",status:"keeping",wornCount:2,lastWorn:null},
-  {name:"Dark wash London skinny jeans",category:"Bottoms",subcategory:"Jeans",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Light wash Torrid skinny jeans",category:"Bottoms",subcategory:"Jeans",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Vervet size 20 jeans",category:"Bottoms",subcategory:"Jeans",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Green London skinny pull-on jeans with fray",category:"Bottoms",subcategory:"Jeans",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Black Torrid booties",category:"Shoes",subcategory:"Boots",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Black Old Navy sneakers",category:"Shoes",subcategory:"Sneakers",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Torrid black flats",category:"Shoes",subcategory:"Flats",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"White sneakers",category:"Shoes",subcategory:"Sneakers",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Cream colored Torrid riding boots",category:"Shoes",subcategory:"Boots",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Light brown Target booties",category:"Shoes",subcategory:"Boots",status:"keeping",wornCount:0,lastWorn:null},
-  {name:"Dark brown riding boots",category:"Shoes",subcategory:"Boots",status:"keeping",wornCount:1,lastWorn:null},
-  {name:"Leopard print flats",category:"Shoes",subcategory:"Flats",status:"keeping",wornCount:1,lastWorn:null},
-].map((item,i)=>({...item,id:`item-${i}`,dateAdded:"2026-03-17"}));
-
-const PRELOADED_OUTFITS = [
-  {id:"outfit-1",name:"Work Outfit #1",type:"work",date:"2026-03-20",itemIds:["item-33","item-0","item-40","item-52"],notes:""},
-  {id:"outfit-2",name:"Work Outfit #2",type:"work",date:"2026-03-21",itemIds:["item-21","item-42","item-46"],notes:"Also wore Torrid vest (not in inventory)"},
-  {id:"outfit-3",name:"Work Outfit #3",type:"work",date:"2026-03-22",itemIds:["item-32","item-2","item-39","item-47"],notes:"⚠️ Low confidence outfit"},
-  {id:"outfit-4",name:"Work Outfit #4",type:"work",date:"2026-03-23",itemIds:["item-22","item-40","item-51"],notes:""},
-  {id:"outfit-5",name:"Casual Outfit #5",type:"casual",date:"2026-03-24",itemIds:["item-12","item-0","item-43","item-48"],notes:""},
+var ITEMS=[
+["Black L.L. Bean tank","Tops","Tanks",1],
+["White L.L. Bean tank","Tops","Tanks",0],
+["Lane Bryant tank","Tops","Tanks",1],
+["Black Torrid t-shirt","Tops","T-Shirts",0],
+["Black Old Navy t-shirt","Tops","T-Shirts",0],
+["Black Torrid SS sweater tee","Tops","T-Shirts",0],
+["White L.L. Bean t-shirt","Tops","T-Shirts",0],
+["White Torrid t-shirt","Tops","T-Shirts",0],
+["Cream colored t-shirt","Tops","T-Shirts",0],
+["Green/mint L.L. Bean t-shirt","Tops","T-Shirts",0],
+["LS light blue chambray button up","Tops","Button Ups",0],
+["SS chambray button up","Tops","Button Ups",0],
+["Dark Amazon brown plaid button up","Tops","Button Ups",1],
+["Light brown/gray flannel button up","Tops","Button Ups",0],
+["Buffalo plaid button up","Tops","Button Ups",0],
+["Dark green plaid button up","Tops","Button Ups",0],
+["Black LS scoop Good American","Tops","Sweaters",0],
+["Black Torrid v-neck LS","Tops","Sweaters",0],
+["Amazon lightweight black sweater","Tops","Sweaters",0],
+["Black 3/4 sleeve scallop sweater","Tops","Sweaters",0],
+["V-neck black Torrid sweater","Tops","Sweaters",0],
+["Amazon lightweight gray sweater","Tops","Sweaters",1],
+["Amazon v-neck brown sweater","Tops","Sweaters",1],
+["Fuzzy L.L. Bean cream pullover","Tops","Sweaters",0],
+["V-neck cream Old Navy sweater","Tops","Sweaters",0],
+["Gray LS sweater bronze buttons","Tops","Sweaters",0],
+["Torrid blue/white striped sweater","Tops","Sweaters",0],
+["Navy Inspire crew neck sweater","Tops","Sweaters",0],
+["Green We Wander LS","Tops","Sweaters",0],
+["Corduroy pullover","Tops","Sweaters",0],
+["White blouse","Tops","Blouses",0],
+["Dark green blouse","Tops","Blouses",0],
+["Torrid black blazer","Outerwear","Blazers",1],
+["Tan blazer","Outerwear","Blazers",1],
+["Purple blazer","Outerwear","Blazers",0],
+["Teal blazer","Outerwear","Blazers",0],
+["White Inspire half zip","Tops","Sweatshirts",0],
+["Navy Inspire zip up jacket","Tops","Sweatshirts",0],
+["Teal L.L. Bean pullover","Tops","Sweatshirts",0],
+["Torrid cropped gray dress pants","Bottoms","Pants",1],
+["Dark wash Torrid skinny jeans","Bottoms","Jeans",2],
+["Dark wash London skinny jeans","Bottoms","Jeans",0],
+["Light wash Torrid skinny jeans","Bottoms","Jeans",1],
+["Vervet size 20 jeans","Bottoms","Jeans",1],
+["Green London pull-on jeans","Bottoms","Jeans",0],
+["Black Torrid booties","Shoes","Boots",0],
+["Black Old Navy sneakers","Shoes","Sneakers",1],
+["Torrid black flats","Shoes","Flats",1],
+["White sneakers","Shoes","Sneakers",1],
+["Cream Torrid riding boots","Shoes","Boots",0],
+["Light brown Target booties","Shoes","Boots",0],
+["Dark brown riding boots","Shoes","Boots",1],
+["Leopard print flats","Shoes","Flats",1]
 ];
 
-const CAPSULE_LIMITS = {
-  Tops:{target:25,icon:"👕"},Bottoms:{target:8,icon:"👖"},Outerwear:{target:5,icon:"🧥"},
-  Shoes:{target:8,icon:"👟"},Activewear:{target:6,icon:"🏃‍♀️"},Sleepwear:{target:4,icon:"😴"},
-  Accessories:{target:10,icon:"👜"},Formal:{target:3,icon:"✨"},Dresses:{target:5,icon:"👗"},
-};
-const CATEGORIES = Object.keys(CAPSULE_LIMITS);
-const SUBCATEGORIES = {
-  Tops:["Tanks","T-Shirts","Button Ups","Sweaters & LS","Blouses","Sweatshirts"],
-  Bottoms:["Jeans","Pants","Shorts","Skirts"],
-  Outerwear:["Blazers","Coats","Jackets"],
-  Shoes:["Boots","Sneakers","Flats","Heels","Sandals"],
-  Activewear:["Tops","Bottoms","Sets"],Sleepwear:["PJs","Robes"],
-  Accessories:["Bags","Jewelry","Scarves","Hats","Belts"],
-  Formal:["Dresses","Suits"],Dresses:["Casual","Formal","Midi","Maxi"],
-};
-const OUTFIT_TYPES = ["work","casual","date night","weekend","activewear","other"];
-const STATUS_OPTIONS = ["keeping","donating","maybe"];
-const C = {
-  bg:"#FAF5F0",card:"#FFFFFF",accent:"#C4704B",accentLight:"#E8A889",
-  sage:"#8B9E7E",sageLight:"#C5D4B8",warm:"#D4A574",warmLight:"#F0DCC8",
-  text:"#3D2E1F",textMuted:"#8A7968",border:"#E8DDD0",
-  donate:"#C4704B",keep:"#8B9E7E",maybe:"#D4A574",danger:"#C45B5B",
-};
+function makeItems(){
+  return ITEMS.map(function(x,i){
+    return{id:"item-"+i,name:x[0],category:x[1],subcategory:x[2],status:"keeping",wornCount:x[3],lastWorn:null};
+  });
+}
 
-const DEFAULT_STATE = {items:REAL_ITEMS,outfits:PRELOADED_OUTFITS,donatedCount:25,version:2};
+var DEF_OUTFITS=[
+  {id:"outfit-1",name:"Work Outfit #1",type:"work",date:"2026-03-20",itemIds:["item-33","item-0","item-40","item-52"],notes:""},
+  {id:"outfit-2",name:"Work Outfit #2",type:"work",date:"2026-03-21",itemIds:["item-21","item-42","item-46"],notes:"Also wore Torrid vest (not in inventory)"},
+  {id:"outfit-3",name:"Work Outfit #3",type:"work",date:"2026-03-22",itemIds:["item-32","item-2","item-39","item-47"],notes:"Low confidence outfit"},
+  {id:"outfit-4",name:"Work Outfit #4",type:"work",date:"2026-03-23",itemIds:["item-22","item-40","item-51"],notes:""},
+  {id:"outfit-5",name:"Casual Outfit #5",type:"casual",date:"2026-03-24",itemIds:["item-12","item-0","item-43","item-48"],notes:""}
+];
 
-function reducer(state,action) {
-  switch(action.type) {
-    case "ADD_ITEM": return {...state,items:[...state.items,{...action.payload,id:`item-${Date.now()}-${Math.random().toString(36).slice(2,6)}`}]};
-    case "UPDATE_ITEM": return {...state,items:state.items.map(i=>i.id===action.id?{...i,...action.payload}:i)};
-    case "DELETE_ITEM": return {...state,items:state.items.filter(i=>i.id!==action.id)};
-    case "DONATE_ITEM": return {...state,items:state.items.filter(i=>i.id!==action.id),donatedCount:state.donatedCount+1};
-    case "LOG_OUTFIT": return {...state,outfits:[...state.outfits,{...action.payload,id:`outfit-${Date.now()}`,date:new Date().toISOString().slice(0,10)}]};
-    case "DELETE_OUTFIT": return {...state,outfits:state.outfits.filter(o=>o.id!==action.id)};
-    case "WEAR_ITEM": return {...state,items:state.items.map(i=>i.id===action.id?{...i,wornCount:(i.wornCount||0)+1,lastWorn:new Date().toISOString().slice(0,10)}:i)};
-    case "LOAD_STATE": return action.payload;
-    case "RESET": return DEFAULT_STATE;
-    default: return state;
+var CATS={"Tops":[25],"Bottoms":[8],"Outerwear":[5],"Shoes":[8]};
+var CATK=["Tops","Bottoms","Outerwear","Shoes"];
+var SUBS={"Tops":["Tanks","T-Shirts","Button Ups","Sweaters","Blouses","Sweatshirts"],"Bottoms":["Jeans","Pants"],"Outerwear":["Blazers","Coats","Jackets"],"Shoes":["Boots","Sneakers","Flats","Heels"]};
+
+var st,tab="dashboard",invS="all",invC="all",invSub="all",invQ="",showAdd=false,editId=null;
+var formN="",formCat="Tops",formSub="",formSt="keeping",formNo="";
+var oView="log",oSel=[],oName="",oType="casual",oNotes="",oFC="all";
+
+function makeDef(){return{items:makeItems(),outfits:DEF_OUTFITS.map(function(o){return JSON.parse(JSON.stringify(o))}),donated:25}}
+
+function load(){try{var s=localStorage.getItem("wt5");if(s)return JSON.parse(s)}catch(e){}return null}
+function save(){try{localStorage.setItem("wt5",JSON.stringify(st))}catch(e){}}
+
+st=load()||makeDef();
+
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function td(){return new Date().toISOString().slice(0,10)}
+
+function bgc(s){return s==="keeping"?"bg bg-k":s==="donating"?"bg bg-d":"bg bg-m"}
+function bgt(s){return s==="keeping"?"Keep":s==="donating"?"Donate":"Maybe"}
+
+function R(){
+  var keep=st.items.filter(function(i){return i.status==="keeping"});
+  var a=document.getElementById("app");
+  var h="";
+
+  h+='<div class="hdr"><div style="display:flex;align-items:center;gap:10px">';
+  h+='<span style="font-size:24px">&#x1F457;</span><div>';
+  h+='<h1>Anna\'s Wardrobe Tracker</h1>';
+  h+='<p>Capsule-Lite - '+keep.length+' items - '+st.donated+' donated</p>';
+  h+='</div></div></div>';
+
+  h+='<div class="tabs">';
+  h+='<button class="tb'+(tab==="dashboard"?" on":"")+'" onclick="T(\'dashboard\')">Dashboard</button>';
+  h+='<button class="tb'+(tab==="inventory"?" on":"")+'" onclick="T(\'inventory\')">Inventory<span class="cn">'+st.items.length+'</span></button>';
+  h+='<button class="tb'+(tab==="outfits"?" on":"")+'" onclick="T(\'outfits\')">Outfits<span class="cn">'+st.outfits.length+'</span></button>';
+  h+='<button class="tb'+(tab==="settings"?" on":"")+'" onclick="T(\'settings\')">Settings</button>';
+  h+='</div><div class="wrap">';
+
+  if(tab==="dashboard") h+=rDash(keep);
+  else if(tab==="inventory") h+=rInv();
+  else if(tab==="outfits") h+=rOut(keep);
+  else h+=rSet();
+
+  h+='</div>';
+  a.innerHTML=h;
+}
+
+function rDash(keep){
+  var worn=keep.filter(function(i){return i.wornCount>0}).length;
+  var h='<div class="fw" style="margin-bottom:14px">';
+  h+=sCard("Wardrobe",keep.length,"#8B9E7E");
+  h+=sCard("Donated",st.donated,"#C4704B");
+  h+=sCard("Outfits",st.outfits.length,"#C4704B");
+  h+=sCard("Worn",worn,"#D4A574");
+  h+='</div>';
+
+  var sg={};keep.forEach(function(i){var k=i.subcategory||i.category;sg[k]=(sg[k]||0)+1});
+  var sd=Object.keys(sg).map(function(k){return[k,sg[k]]}).sort(function(a,b){return b[1]-a[1]}).slice(0,8);
+  var mx=sd.length?Math.max.apply(null,sd.map(function(d){return d[1]})):1;
+
+  h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">By Subcategory</h3>';
+  for(var i=0;i<sd.length;i++){
+    var pct=Math.round((sd[i][1]/mx)*100);
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">';
+    h+='<span style="font-size:11px;color:#8A7968;width:85px;text-align:right">'+sd[i][0]+'</span>';
+    h+='<div style="flex:1;height:16px;background:#E8DDD0;border-radius:4px;overflow:hidden">';
+    h+='<div style="width:'+pct+'%;height:100%;background:#8B9E7E;border-radius:4px"></div></div>';
+    h+='<span style="font-size:11px;font-weight:600;width:18px">'+sd[i][1]+'</span></div>';
   }
+  h+='</div>';
+
+  h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Capsule-Lite Targets</h3>';
+  h+='<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">';
+  for(var j=0;j<CATK.length;j++){
+    var c=CATK[j],cur=keep.filter(function(x){return x.category===c}).length,tgt=CATS[c][0];
+    h+=rRing(cur,tgt,c);
+  }
+  h+='</div></div>';
+  return h;
 }
 
-function usePersistedState() {
-  const [state,dispatch] = useReducer(reducer,DEFAULT_STATE);
-  const [loaded,setLoaded] = useState(false);
-  const [saveStatus,setSaveStatus] = useState("");
-  useEffect(()=>{
-    const saved = storage.get("wardrobe-state-v2");
-    if(saved) dispatch({type:"LOAD_STATE",payload:saved});
-    setLoaded(true);
-  },[]);
-  useEffect(()=>{
-    if(!loaded) return;
-    const ok = storage.set("wardrobe-state-v2",state);
-    setSaveStatus(ok?"saved":"error");
-    const t = setTimeout(()=>setSaveStatus(""),1500);
-    return ()=>clearTimeout(t);
-  },[state,loaded]);
-  return {state,dispatch,loaded,saveStatus};
+function sCard(label,val,color){
+  return'<div class="cd" style="flex:1;min-width:70px"><div style="font-size:22px;font-weight:700;color:'+color+';font-family:Playfair Display,serif">'+val+'</div><div style="font-size:10px;color:#8A7968">'+label+'</div></div>';
 }
 
-// ─── Components ───
-function TabBtn({active,onClick,children,count}) {
-  return <button onClick={onClick} style={{
-    padding:"10px 16px",border:"none",borderBottom:active?`3px solid ${C.accent}`:"3px solid transparent",
-    background:"none",color:active?C.accent:C.textMuted,fontFamily:"'DM Sans',sans-serif",fontSize:"13px",
-    fontWeight:active?700:500,cursor:"pointer",display:"flex",alignItems:"center",gap:"5px",whiteSpace:"nowrap",
-  }}>{children}{count!==undefined&&<span style={{background:active?C.accentLight:C.border,color:active?C.accent:C.textMuted,borderRadius:"10px",padding:"1px 7px",fontSize:"11px",fontWeight:600}}>{count}</span>}</button>;
+function rRing(cur,tgt,label){
+  var pct=Math.min(Math.round((cur/tgt)*100),100);
+  var over=cur>tgt;var co=over?"#C45B5B":"#8B9E7E";
+  var r=22,circ=Math.round(2*3.14159*r);
+  var dash=Math.round((pct/100)*circ);
+  var h='<div style="text-align:center;min-width:68px">';
+  h+='<div style="position:relative;width:52px;height:52px;margin:0 auto">';
+  h+='<svg width="52" height="52" viewBox="0 0 52 52">';
+  h+='<circle cx="26" cy="26" r="'+r+'" fill="none" stroke="#E8DDD0" stroke-width="4"/>';
+  h+='<circle cx="26" cy="26" r="'+r+'" fill="none" stroke="'+co+'" stroke-width="4" stroke-dasharray="'+dash+' '+circ+'" stroke-linecap="round" transform="rotate(-90 26 26)"/>';
+  h+='</svg>';
+  h+='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:700;color:'+(over?"#C45B5B":"#3D2E1F")+'">'+cur+'/'+tgt+'</div>';
+  h+='</div><div style="font-size:9px;color:#8A7968;margin-top:3px">'+label+'</div></div>';
+  return h;
 }
 
-function StatCard({icon,label,value,sub,color=C.accent}) {
-  return <div style={{background:C.card,borderRadius:"14px",padding:"16px",border:`1px solid ${C.border}`,flex:"1",minWidth:"120px"}}>
-    <div style={{fontSize:"20px",marginBottom:"4px"}}>{icon}</div>
-    <div style={{fontSize:"24px",fontWeight:700,color,fontFamily:"'Playfair Display',serif"}}>{value}</div>
-    <div style={{fontSize:"11px",color:C.textMuted,fontWeight:500}}>{label}</div>
-    {sub&&<div style={{fontSize:"10px",color:C.textMuted,marginTop:"2px"}}>{sub}</div>}
-  </div>;
-}
-
-function Badge({status}) {
-  const cm={keeping:C.keep,donating:C.donate,maybe:C.maybe};
-  const lm={keeping:"✅ Keep",donating:"📦 Donate",maybe:"🤔 Maybe"};
-  return <span style={{display:"inline-block",padding:"2px 9px",borderRadius:"12px",fontSize:"11px",fontWeight:600,background:`${cm[status]}18`,color:cm[status],border:`1px solid ${cm[status]}40`}}>{lm[status]}</span>;
-}
-
-function ProgressRing({current,target,label,icon}) {
-  const pct=Math.min(Math.round((current/target)*100),100);
-  const over=current>target;const color=over?C.danger:C.keep;
-  return <div style={{textAlign:"center",minWidth:"80px"}}>
-    <div style={{position:"relative",width:"60px",height:"60px",margin:"0 auto"}}>
-      <svg width="60" height="60" viewBox="0 0 60 60">
-        <circle cx="30" cy="30" r="24" fill="none" stroke={C.border} strokeWidth="5"/>
-        <circle cx="30" cy="30" r="24" fill="none" stroke={color} strokeWidth="5" strokeDasharray={`${(pct/100)*150.8} 150.8`} strokeLinecap="round" transform="rotate(-90 30 30)" style={{transition:"stroke-dasharray 0.5s ease"}}/>
-      </svg>
-      <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",fontSize:"12px",fontWeight:700,color:over?C.danger:C.text}}>{current}/{target}</div>
-    </div>
-    <div style={{fontSize:"10px",color:C.textMuted,marginTop:"4px"}}>{icon} {label}</div>
-  </div>;
-}
-
-function TypeBadge({type}) {
-  const colors={work:"#5B7BA5",casual:C.sage,"date night":"#A05B8C",weekend:C.warm,activewear:"#5BA57B",other:C.textMuted};
-  const icons={work:"💼",casual:"👟","date night":"💃",weekend:"☀️",activewear:"🏃‍♀️",other:"👗"};
-  return <span style={{display:"inline-block",padding:"2px 9px",borderRadius:"12px",fontSize:"10px",fontWeight:600,background:`${colors[type]||C.textMuted}18`,color:colors[type]||C.textMuted,border:`1px solid ${colors[type]||C.textMuted}40`}}>{icons[type]||"👗"} {type}</span>;
-}
-
-// ─── Dashboard ───
-function Dashboard({state}) {
-  const keeping=state.items.filter(i=>i.status==="keeping");
-  const maybes=state.items.filter(i=>i.status==="maybe");
-  const pieData=[{name:"Keeping",value:keeping.length},{name:"Donated",value:state.donatedCount},{name:"Maybe",value:maybes.length}].filter(d=>d.value>0);
-  const subGroups={};
-  keeping.forEach(i=>{const key=i.subcategory||i.category;subGroups[key]=(subGroups[key]||0)+1;});
-  const subData=Object.entries(subGroups).map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count);
-  const wornItems=keeping.filter(i=>i.wornCount>0).length;
-  const unwornItems=keeping.filter(i=>!i.wornCount).length;
-  return <div>
-    <div style={{display:"flex",gap:"10px",flexWrap:"wrap",marginBottom:"20px"}}>
-      <StatCard icon="👗" label="Current Wardrobe" value={keeping.length} color={C.keep}/>
-      <StatCard icon="📦" label="Total Donated" value={state.donatedCount} color={C.donate} sub="Since Mar 17"/>
-      <StatCard icon="👔" label="Outfits Logged" value={state.outfits.length} color={C.accent}/>
-      <StatCard icon="👕" label="Items Worn" value={wornItems} color={C.warm} sub={`${unwornItems} unworn`}/>
-    </div>
-    <div style={{display:"flex",gap:"16px",flexWrap:"wrap",marginBottom:"20px"}}>
-      <div style={{background:C.card,borderRadius:"14px",padding:"18px",border:`1px solid ${C.border}`,flex:"1",minWidth:"240px"}}>
-        <h3 style={{margin:"0 0 12px",fontSize:"14px",color:C.text,fontFamily:"'DM Sans',sans-serif"}}>📊 Overview</h3>
-        <ResponsiveContainer width="100%" height={170}>
-          <PieChart><Pie data={pieData} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" paddingAngle={3} strokeWidth={0}>
-            {pieData.map((_,i)=><Cell key={i} fill={[C.keep,C.donate,C.maybe][i]}/>)}
-          </Pie><Tooltip formatter={(v,n)=>[`${v} items`,n]}/><Legend wrapperStyle={{fontSize:"11px"}}/></PieChart>
-        </ResponsiveContainer>
-      </div>
-      <div style={{background:C.card,borderRadius:"14px",padding:"18px",border:`1px solid ${C.border}`,flex:"1.4",minWidth:"280px"}}>
-        <h3 style={{margin:"0 0 12px",fontSize:"14px",color:C.text,fontFamily:"'DM Sans',sans-serif"}}>👚 By Subcategory</h3>
-        <ResponsiveContainer width="100%" height={170}>
-          <BarChart data={subData} layout="vertical" margin={{left:80}}>
-            <XAxis type="number" tick={{fontSize:11}}/><YAxis type="category" dataKey="name" tick={{fontSize:11}} width={75}/>
-            <Tooltip/><Bar dataKey="count" name="Items" fill={C.sage} radius={[0,4,4,0]}/>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-    <div style={{background:C.card,borderRadius:"14px",padding:"18px",border:`1px solid ${C.border}`}}>
-      <h3 style={{margin:"0 0 14px",fontSize:"14px",color:C.text,fontFamily:"'DM Sans',sans-serif"}}>🎯 Capsule-Lite Targets</h3>
-      <div style={{display:"flex",gap:"12px",flexWrap:"wrap",justifyContent:"center"}}>
-        {CATEGORIES.map(cat=><ProgressRing key={cat} current={keeping.filter(i=>i.category===cat).length} target={CAPSULE_LIMITS[cat].target} label={cat} icon={CAPSULE_LIMITS[cat].icon}/>)}
-      </div>
-    </div>
-  </div>;
-}
-
-// ─── Inventory ───
-function Inventory({state,dispatch}) {
-  const [showAdd,setShowAdd]=useState(false);
-  const [filter,setFilter]=useState("all");
-  const [catFilter,setCatFilter]=useState("all");
-  const [subFilter,setSubFilter]=useState("all");
-  const [search,setSearch]=useState("");
-  const [form,setForm]=useState({name:"",category:"Tops",subcategory:"",status:"keeping",notes:""});
-  const [editId,setEditId]=useState(null);
-  const filtered=state.items.filter(i=>{
-    if(filter!=="all"&&i.status!==filter) return false;
-    if(catFilter!=="all"&&i.category!==catFilter) return false;
-    if(subFilter!=="all"&&i.subcategory!==subFilter) return false;
-    if(search&&!i.name.toLowerCase().includes(search.toLowerCase())) return false;
+function rInv(){
+  var items=st.items.filter(function(i){
+    if(invS!=="all"&&i.status!==invS)return false;
+    if(invC!=="all"&&i.category!==invC)return false;
+    if(invSub!=="all"&&i.subcategory!==invSub)return false;
+    if(invQ&&i.name.toLowerCase().indexOf(invQ.toLowerCase())<0)return false;
     return true;
   });
-  const availableSubs=catFilter!=="all"?(SUBCATEGORIES[catFilter]||[]):[];
-  const handleSubmit=()=>{
-    if(!form.name.trim()) return;
-    if(editId){dispatch({type:"UPDATE_ITEM",id:editId,payload:form});setEditId(null);}
-    else{dispatch({type:"ADD_ITEM",payload:{...form,dateAdded:new Date().toISOString().slice(0,10),wornCount:0,lastWorn:null}});}
-    setForm({name:"",category:"Tops",subcategory:"",status:"keeping",notes:""});setShowAdd(false);
-  };
-  const startEdit=(item)=>{setForm({name:item.name,category:item.category,subcategory:item.subcategory||"",status:item.status,notes:item.notes||""});setEditId(item.id);setShowAdd(true);};
-  const inp={padding:"9px 12px",border:`1px solid ${C.border}`,borderRadius:"10px",fontSize:"13px",fontFamily:"'DM Sans',sans-serif",color:C.text,background:C.bg,outline:"none",width:"100%",boxSizing:"border-box"};
-  const btnSm=(extra={})=>({width:"30px",height:"30px",border:`1px solid ${C.border}`,borderRadius:"8px",background:C.bg,cursor:"pointer",fontSize:"13px",display:"flex",alignItems:"center",justifyContent:"center",...extra});
+  var asubs=invC!=="all"?(SUBS[invC]||[]):[];
 
-  return <div>
-    <div style={{display:"flex",gap:"8px",marginBottom:"14px",flexWrap:"wrap",alignItems:"center"}}>
-      <input placeholder="🔍 Search..." value={search} onChange={e=>setSearch(e.target.value)} style={{...inp,width:"140px",flex:"1"}}/>
-      <select value={filter} onChange={e=>setFilter(e.target.value)} style={{...inp,width:"auto",cursor:"pointer"}}>
-        <option value="all">All Status</option><option value="keeping">✅ Keep</option><option value="donating">📦 Donate</option><option value="maybe">🤔 Maybe</option>
-      </select>
-      <select value={catFilter} onChange={e=>{setCatFilter(e.target.value);setSubFilter("all");}} style={{...inp,width:"auto",cursor:"pointer"}}>
-        <option value="all">All Categories</option>
-        {CATEGORIES.map(c=><option key={c} value={c}>{CAPSULE_LIMITS[c].icon} {c}</option>)}
-      </select>
-      {availableSubs.length>0&&<select value={subFilter} onChange={e=>setSubFilter(e.target.value)} style={{...inp,width:"auto",cursor:"pointer"}}>
-        <option value="all">All Subtypes</option>{availableSubs.map(s=><option key={s} value={s}>{s}</option>)}
-      </select>}
-      <button onClick={()=>{setShowAdd(!showAdd);setEditId(null);setForm({name:"",category:"Tops",subcategory:"",status:"keeping",notes:""});}}
-        style={{padding:"9px 18px",background:C.accent,color:"#fff",border:"none",borderRadius:"10px",fontSize:"13px",fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",whiteSpace:"nowrap"}}>
-        {showAdd?"✕ Cancel":"＋ Add Item"}
-      </button>
-    </div>
-    {showAdd&&<div style={{background:C.card,borderRadius:"14px",padding:"18px",border:`1px solid ${C.border}`,marginBottom:"14px"}}>
-      <h4 style={{margin:"0 0 12px",color:C.text,fontFamily:"'DM Sans',sans-serif",fontSize:"14px"}}>{editId?"✏️ Edit Item":"➕ New Item"}</h4>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px"}}>
-        <input placeholder="Item name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})} style={{...inp,gridColumn:"1 / -1"}}/>
-        <select value={form.category} onChange={e=>setForm({...form,category:e.target.value,subcategory:""})} style={inp}>
-          {CATEGORIES.map(c=><option key={c} value={c}>{CAPSULE_LIMITS[c].icon} {c}</option>)}
-        </select>
-        <select value={form.subcategory} onChange={e=>setForm({...form,subcategory:e.target.value})} style={inp}>
-          <option value="">Subcategory...</option>{(SUBCATEGORIES[form.category]||[]).map(s=><option key={s} value={s}>{s}</option>)}
-        </select>
-        <select value={form.status} onChange={e=>setForm({...form,status:e.target.value})} style={inp}>
-          {STATUS_OPTIONS.map(s=><option key={s} value={s}>{s==="keeping"?"✅ Keeping":s==="donating"?"📦 Donating":"🤔 Maybe"}</option>)}
-        </select>
-        <input placeholder="Notes (optional)" value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} style={inp}/>
-      </div>
-      <button onClick={handleSubmit} style={{marginTop:"12px",padding:"9px 24px",background:C.sage,color:"#fff",border:"none",borderRadius:"10px",fontSize:"13px",fontWeight:600,cursor:"pointer"}}>
-        {editId?"💾 Save":"✅ Add"}
-      </button>
-    </div>}
-    <div style={{fontSize:"12px",color:C.textMuted,marginBottom:"10px"}}>{filtered.length} item{filtered.length!==1?"s":""}</div>
-    <div style={{display:"flex",flexDirection:"column",gap:"6px"}}>
-      {filtered.map(item=><div key={item.id} style={{background:C.card,borderRadius:"12px",padding:"12px 16px",border:`1px solid ${C.border}`,display:"flex",alignItems:"center",gap:"10px"}}>
-        <span style={{fontSize:"18px"}}>{CAPSULE_LIMITS[item.category]?.icon||"👚"}</span>
-        <div style={{flex:1,minWidth:0}}>
-          <div style={{fontWeight:600,fontSize:"13px",color:C.text,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</div>
-          <div style={{fontSize:"11px",color:C.textMuted}}>{item.subcategory||item.category}{item.wornCount>0?` • Worn ${item.wornCount}×`:""}{item.lastWorn?` • Last: ${item.lastWorn}`:""}</div>
-        </div>
-        <Badge status={item.status}/>
-        <div style={{display:"flex",gap:"3px"}}>
-          {item.status==="keeping"&&<button onClick={()=>dispatch({type:"WEAR_ITEM",id:item.id})} title="Log wear" style={btnSm()}>👕</button>}
-          <button onClick={()=>startEdit(item)} title="Edit" style={btnSm()}>✏️</button>
-          {item.status==="keeping"&&<button onClick={()=>{if(confirm("Donate this item?"))dispatch({type:"DONATE_ITEM",id:item.id});}} title="Donate" style={btnSm({border:`1px solid ${C.donate}40`,background:`${C.donate}08`})}>📦</button>}
-          <button onClick={()=>{if(confirm("Delete?"))dispatch({type:"DELETE_ITEM",id:item.id});}} title="Delete" style={btnSm({border:`1px solid ${C.danger}30`,background:`${C.danger}08`})}>🗑️</button>
-        </div>
-      </div>)}
-      {filtered.length===0&&<div style={{textAlign:"center",padding:"36px",color:C.textMuted}}><div style={{fontSize:"28px",marginBottom:"8px"}}>👗</div><div>No items found</div></div>}
-    </div>
-  </div>;
+  var h='<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center">';
+  h+='<input class="ip" style="flex:1;min-width:90px" placeholder="Search..." value="'+esc(invQ)+'" oninput="window._invQ(this.value)">';
+  h+='<select class="ip" style="width:auto" onchange="window._invS(this.value)">';
+  h+='<option value="all"'+(invS==="all"?" selected":"")+'>All</option><option value="keeping"'+(invS==="keeping"?" selected":"")+'>Keep</option><option value="donating"'+(invS==="donating"?" selected":"")+'>Donate</option><option value="maybe"'+(invS==="maybe"?" selected":"")+'>Maybe</option></select>';
+  h+='<select class="ip" style="width:auto" onchange="window._invC(this.value)">';
+  h+='<option value="all">All Cat</option>';
+  for(var ci=0;ci<CATK.length;ci++)h+='<option value="'+CATK[ci]+'"'+(invC===CATK[ci]?" selected":"")+'>'+CATK[ci]+'</option>';
+  h+='</select>';
+  if(asubs.length){
+    h+='<select class="ip" style="width:auto" onchange="window._invSub(this.value)"><option value="all">All Sub</option>';
+    for(var si=0;si<asubs.length;si++)h+='<option value="'+asubs[si]+'"'+(invSub===asubs[si]?" selected":"")+'>'+asubs[si]+'</option>';
+    h+='</select>';
+  }
+  h+='<button class="bt ba" onclick="window._togAdd()">'+(showAdd?"Cancel":"+ Add")+'</button></div>';
+
+  if(showAdd){
+    var fsubs=SUBS[formCat]||[];
+    h+='<div class="cd"><h4 style="margin:0 0 8px;font-size:14px">'+(editId?"Edit Item":"New Item")+'</h4>';
+    h+='<div class="g2">';
+    h+='<input class="ip" style="grid-column:1/-1" placeholder="Item name" value="'+esc(formN)+'" oninput="window._fN(this.value)">';
+    h+='<select class="ip" onchange="window._fCat(this.value)">';
+    for(var fi=0;fi<CATK.length;fi++)h+='<option value="'+CATK[fi]+'"'+(formCat===CATK[fi]?" selected":"")+'>'+CATK[fi]+'</option>';
+    h+='</select>';
+    h+='<select class="ip" onchange="window._fSub(this.value)"><option value="">Sub...</option>';
+    for(var fsi=0;fsi<fsubs.length;fsi++)h+='<option value="'+fsubs[fsi]+'"'+(formSub===fsubs[fsi]?" selected":"")+'>'+fsubs[fsi]+'</option>';
+    h+='</select>';
+    h+='<select class="ip" onchange="window._fSt(this.value)"><option value="keeping"'+(formSt==="keeping"?" selected":"")+'>Keeping</option><option value="donating"'+(formSt==="donating"?" selected":"")+'>Donating</option><option value="maybe"'+(formSt==="maybe"?" selected":"")+'>Maybe</option></select>';
+    h+='<input class="ip" placeholder="Notes" value="'+esc(formNo)+'" oninput="window._fNo(this.value)">';
+    h+='</div><button class="bt bs" style="margin-top:8px" onclick="window._submit()">'+(editId?"Save":"Add")+'</button></div>';
+  }
+
+  h+='<div style="font-size:11px;color:#8A7968;margin-bottom:6px">'+items.length+' item'+(items.length!==1?"s":"")+'</div>';
+
+  for(var ii=0;ii<items.length;ii++){
+    var it=items[ii];
+    h+='<div class="row">';
+    h+='<div style="flex:1;min-width:0"><div class="nm">'+esc(it.name)+'</div>';
+    h+='<div class="sm">'+(it.subcategory||it.category)+(it.wornCount>0?" - "+it.wornCount+"x":"")+'</div></div>';
+    h+='<span class="'+bgc(it.status)+'">'+bgt(it.status)+'</span>';
+    if(it.status==="keeping")h+='<button class="sm-b" onclick="window._wear(\''+it.id+'\')">+1</button>';
+    h+='<button class="sm-b" onclick="window._edit(\''+it.id+'\')">&#9998;</button>';
+    if(it.status==="keeping")h+='<button class="sm-b" style="border-color:rgba(196,112,75,0.27)" onclick="window._don(\''+it.id+'\')">&#10005;</button>';
+    h+='</div>';
+  }
+  if(!items.length)h+='<div style="text-align:center;padding:30px;color:#8A7968">No items found</div>';
+  return h;
 }
 
-// ─── Outfits ───
-function Outfits({state,dispatch}) {
-  const [selectedItems,setSelectedItems]=useState([]);
-  const [outfitName,setOutfitName]=useState("");
-  const [outfitType,setOutfitType]=useState("casual");
-  const [outfitNotes,setOutfitNotes]=useState("");
-  const [filterCat,setFilterCat]=useState("all");
-  const [viewMode,setViewMode]=useState("log");
-  const keepingItems=state.items.filter(i=>i.status==="keeping");
-  const displayItems=filterCat==="all"?keepingItems:keepingItems.filter(i=>i.category===filterCat);
-  const toggleItem=(id)=>setSelectedItems(prev=>prev.includes(id)?prev.filter(x=>x!==id):[...prev,id]);
-  const logOutfit=()=>{
-    if(selectedItems.length===0) return;
-    dispatch({type:"LOG_OUTFIT",payload:{name:outfitName||`Outfit #${state.outfits.length+1}`,type:outfitType,itemIds:selectedItems,notes:outfitNotes}});
-    selectedItems.forEach(id=>dispatch({type:"WEAR_ITEM",id}));
-    setSelectedItems([]);setOutfitName("");setOutfitNotes("");
-  };
-  const wearData=keepingItems.filter(i=>i.wornCount>0).sort((a,b)=>b.wornCount-a.wornCount).slice(0,10);
-  const neverWorn=keepingItems.filter(i=>!i.wornCount||i.wornCount===0);
-  const inp={padding:"9px 12px",border:`1px solid ${C.border}`,borderRadius:"10px",fontSize:"13px",fontFamily:"'DM Sans',sans-serif",color:C.text,background:C.bg,outline:"none",width:"100%",boxSizing:"border-box"};
+function rOut(keep){
+  var disp=oFC==="all"?keep:keep.filter(function(i){return i.category===oFC});
+  var h='<div style="display:flex;gap:6px;margin-bottom:12px">';
+  var vws=[["log","+ Log"],["history","History"],["stats","Stats"]];
+  for(var vi=0;vi<vws.length;vi++){
+    h+='<button class="gh'+(oView===vws[vi][0]?" on":"")+'" onclick="window._oV(\''+vws[vi][0]+'\')">'+vws[vi][1]+'</button>';
+  }
+  h+='</div>';
 
-  return <div>
-    <div style={{display:"flex",gap:"8px",marginBottom:"16px"}}>
-      {[["log","➕ Log Outfit"],["history","📅 History"],["stats","📊 Stats"]].map(([key,label])=>
-        <button key={key} onClick={()=>setViewMode(key)} style={{
-          padding:"8px 16px",border:`1px solid ${viewMode===key?C.accent:C.border}`,borderRadius:"20px",
-          background:viewMode===key?`${C.accent}15`:"transparent",color:viewMode===key?C.accent:C.textMuted,
-          fontSize:"12px",fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",
-        }}>{label}</button>
-      )}
-    </div>
+  if(oView==="log"){
+    h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Log Today\'s Outfit</h3>';
+    h+='<div class="g2" style="margin-bottom:8px">';
+    h+='<input class="ip" placeholder="Outfit name" value="'+esc(oName)+'" oninput="oName=this.value">';
+    h+='<select class="ip" onchange="oType=this.value">';
+    var ots=["work","casual","date night","weekend","other"];
+    for(var oi=0;oi<ots.length;oi++)h+='<option value="'+ots[oi]+'"'+(oType===ots[oi]?" selected":"")+'>'+ots[oi]+'</option>';
+    h+='</select></div>';
+    h+='<input class="ip" style="margin-bottom:8px" placeholder="Notes" value="'+esc(oNotes)+'" oninput="oNotes=this.value">';
 
-    {viewMode==="log"&&<div style={{background:C.card,borderRadius:"14px",padding:"18px",border:`1px solid ${C.border}`}}>
-      <h3 style={{margin:"0 0 12px",fontSize:"14px",color:C.text,fontFamily:"'DM Sans',sans-serif"}}>👗 Log Today's Outfit</h3>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"10px",marginBottom:"10px"}}>
-        <input placeholder="Outfit name (optional)" value={outfitName} onChange={e=>setOutfitName(e.target.value)} style={inp}/>
-        <select value={outfitType} onChange={e=>setOutfitType(e.target.value)} style={inp}>
-          {OUTFIT_TYPES.map(t=><option key={t} value={t}>{t.charAt(0).toUpperCase()+t.slice(1)}</option>)}
-        </select>
-      </div>
-      <input placeholder="Notes (optional)" value={outfitNotes} onChange={e=>setOutfitNotes(e.target.value)} style={{...inp,marginBottom:"10px"}}/>
-      <div style={{display:"flex",gap:"6px",marginBottom:"10px",flexWrap:"wrap"}}>
-        {["all",...CATEGORIES.filter(c=>keepingItems.some(i=>i.category===c))].map(c=>
-          <button key={c} onClick={()=>setFilterCat(c)} style={{
-            padding:"4px 12px",border:`1px solid ${filterCat===c?C.accent:C.border}`,borderRadius:"16px",
-            background:filterCat===c?`${C.accent}15`:"transparent",color:filterCat===c?C.accent:C.textMuted,
-            fontSize:"11px",fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",
-          }}>{c==="all"?"All":`${CAPSULE_LIMITS[c]?.icon} ${c}`}</button>
-        )}
-      </div>
-      <div style={{display:"flex",flexWrap:"wrap",gap:"5px",marginBottom:"12px",maxHeight:"200px",overflowY:"auto"}}>
-        {displayItems.map(item=>
-          <button key={item.id} onClick={()=>toggleItem(item.id)} style={{
-            padding:"5px 10px",border:`2px solid ${selectedItems.includes(item.id)?C.accent:C.border}`,
-            borderRadius:"18px",background:selectedItems.includes(item.id)?`${C.accent}15`:C.bg,
-            fontSize:"11px",fontWeight:selectedItems.includes(item.id)?600:400,
-            color:selectedItems.includes(item.id)?C.accent:C.text,cursor:"pointer",fontFamily:"'DM Sans',sans-serif",
-          }}>{CAPSULE_LIMITS[item.category]?.icon} {item.name}</button>
-        )}
-      </div>
-      <button onClick={logOutfit} disabled={selectedItems.length===0} style={{
-        padding:"9px 22px",background:selectedItems.length>0?C.accent:C.border,color:"#fff",
-        border:"none",borderRadius:"10px",fontSize:"13px",fontWeight:600,
-        cursor:selectedItems.length>0?"pointer":"default",fontFamily:"'DM Sans',sans-serif",
-      }}>✨ Log Outfit ({selectedItems.length} items)</button>
-    </div>}
+    h+='<div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">';
+    var fcats=["all"].concat(CATK);
+    for(var fi=0;fi<fcats.length;fi++){
+      h+='<button class="gh'+(oFC===fcats[fi]?" on":"")+'" style="padding:3px 10px;font-size:11px" onclick="window._oFC(\''+fcats[fi]+'\')">'+fcats[fi]+'</button>';
+    }
+    h+='</div>';
 
-    {viewMode==="history"&&<div style={{background:C.card,borderRadius:"14px",padding:"18px",border:`1px solid ${C.border}`}}>
-      <h3 style={{margin:"0 0 14px",fontSize:"14px",color:C.text,fontFamily:"'DM Sans',sans-serif"}}>📅 All Outfits ({state.outfits.length})</h3>
-      <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
-        {[...state.outfits].reverse().map(outfit=>
-          <div key={outfit.id} style={{padding:"14px",background:C.bg,borderRadius:"12px",border:`1px solid ${C.border}`}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"8px"}}>
-              <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
-                <span style={{fontWeight:600,fontSize:"14px",color:C.text}}>{outfit.name}</span>
-                {outfit.type&&<TypeBadge type={outfit.type}/>}
-              </div>
-              <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
-                <span style={{fontSize:"11px",color:C.textMuted}}>{outfit.date}</span>
-                <button onClick={()=>{if(confirm("Delete this outfit?"))dispatch({type:"DELETE_OUTFIT",id:outfit.id});}}
-                  style={{width:"24px",height:"24px",border:`1px solid ${C.danger}30`,borderRadius:"6px",background:`${C.danger}08`,cursor:"pointer",fontSize:"11px",display:"flex",alignItems:"center",justifyContent:"center"}}>🗑️</button>
-              </div>
-            </div>
-            {outfit.notes&&<div style={{fontSize:"11px",color:C.textMuted,marginBottom:"6px",fontStyle:"italic"}}>{outfit.notes}</div>}
-            <div style={{display:"flex",flexWrap:"wrap",gap:"4px"}}>
-              {outfit.itemIds.map(id=>{
-                const item=state.items.find(i=>i.id===id);
-                return item?<span key={id} style={{padding:"3px 8px",background:C.card,borderRadius:"8px",fontSize:"11px",color:C.text,border:`1px solid ${C.border}`,fontWeight:500}}>{CAPSULE_LIMITS[item.category]?.icon} {item.name}</span>:null;
-              })}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>}
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;max-height:200px;overflow-y:auto">';
+    for(var di=0;di<disp.length;di++){
+      var on=oSel.indexOf(disp[di].id)>=0;
+      h+='<button class="pl'+(on?" on":"")+'" onclick="window._oTog(\''+disp[di].id+'\')">'+esc(disp[di].name)+'</button>';
+    }
+    h+='</div>';
+    h+='<button class="bt ba" '+(oSel.length?'':'disabled style="opacity:0.5"')+' onclick="window._oLog()">Log Outfit ('+oSel.length+')</button></div>';
+  }
 
-    {viewMode==="stats"&&<div style={{display:"flex",gap:"14px",flexWrap:"wrap"}}>
-      <div style={{background:C.card,borderRadius:"14px",padding:"18px",border:`1px solid ${C.border}`,flex:"1",minWidth:"240px"}}>
-        <h3 style={{margin:"0 0 12px",fontSize:"14px",color:C.text,fontFamily:"'DM Sans',sans-serif"}}>🔥 Most Worn</h3>
-        {wearData.length>0?<div style={{display:"flex",flexDirection:"column",gap:"7px"}}>
-          {wearData.map((item,idx)=><div key={item.id} style={{display:"flex",alignItems:"center",gap:"8px"}}>
-            <span style={{fontSize:"13px",fontWeight:700,color:C.textMuted,width:"18px"}}>#{idx+1}</span>
-            <span style={{fontSize:"13px"}}>{CAPSULE_LIMITS[item.category]?.icon}</span>
-            <span style={{flex:1,fontSize:"12px",color:C.text,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</span>
-            <span style={{background:`${C.sage}20`,color:C.sage,padding:"2px 7px",borderRadius:"8px",fontSize:"11px",fontWeight:600}}>{item.wornCount}×</span>
-          </div>)}
-        </div>:<div style={{textAlign:"center",padding:"18px",color:C.textMuted,fontSize:"12px"}}>Log outfits to see stats! 👗</div>}
-      </div>
-      <div style={{background:C.card,borderRadius:"14px",padding:"18px",border:`1px solid ${C.border}`,flex:"1",minWidth:"240px"}}>
-        <h3 style={{margin:"0 0 12px",fontSize:"14px",color:C.text,fontFamily:"'DM Sans',sans-serif"}}>⚠️ Never Worn ({neverWorn.length})</h3>
-        <p style={{fontSize:"11px",color:C.textMuted,margin:"0 0 10px"}}>Consider donating items you haven't worn 💛</p>
-        <div style={{display:"flex",flexDirection:"column",gap:"5px",maxHeight:"200px",overflowY:"auto"}}>
-          {neverWorn.slice(0,20).map(item=><div key={item.id} style={{display:"flex",alignItems:"center",gap:"7px",fontSize:"12px"}}>
-            <span>{CAPSULE_LIMITS[item.category]?.icon}</span>
-            <span style={{flex:1,color:C.text,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</span>
-            <button onClick={()=>dispatch({type:"DONATE_ITEM",id:item.id})}
-              style={{padding:"2px 7px",border:`1px solid ${C.donate}40`,borderRadius:"6px",background:`${C.donate}10`,color:C.donate,fontSize:"10px",cursor:"pointer",fontWeight:600,whiteSpace:"nowrap"}}>📦</button>
-          </div>)}
-        </div>
-      </div>
-    </div>}
-  </div>;
+  if(oView==="history"){
+    h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">All Outfits ('+st.outfits.length+')</h3>';
+    var rev=st.outfits.slice().reverse();
+    for(var hi=0;hi<rev.length;hi++){
+      var o=rev[hi];
+      h+='<div class="oc">';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
+      h+='<div><span style="font-weight:600;font-size:13px">'+esc(o.name)+'</span>';
+      if(o.type)h+=' <span class="bg bg-'+(o.type==="work"?"w":"c")+'">'+o.type+'</span>';
+      h+='</div><span style="font-size:10px;color:#8A7968">'+o.date+'</span></div>';
+      if(o.notes)h+='<div style="font-size:11px;color:#8A7968;margin-bottom:4px;font-style:italic">'+esc(o.notes)+'</div>';
+      for(var oi2=0;oi2<o.itemIds.length;oi2++){
+        var it2=st.items.find(function(x){return x.id===o.itemIds[oi2]});
+        if(it2)h+='<span class="ot">'+esc(it2.name)+'</span>';
+      }
+      h+='</div>';
+    }
+    h+='</div>';
+  }
+
+  if(oView==="stats"){
+    var wd=keep.filter(function(i){return i.wornCount>0}).sort(function(a,b){return b.wornCount-a.wornCount}).slice(0,10);
+    var nw=keep.filter(function(i){return!i.wornCount});
+    h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Most Worn</h3>';
+    if(wd.length){for(var wi=0;wi<wd.length;wi++){
+      h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
+      h+='<span style="font-size:11px;font-weight:700;color:#8A7968;width:16px">#'+(wi+1)+'</span>';
+      h+='<span style="flex:1;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(wd[wi].name)+'</span>';
+      h+='<span style="background:rgba(139,158,126,0.13);color:#8B9E7E;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:600">'+wd[wi].wornCount+'x</span></div>';
+    }}else{h+='<div style="text-align:center;padding:14px;color:#8A7968;font-size:12px">Log outfits to see stats!</div>';}
+    h+='</div>';
+
+    h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Never Worn ('+nw.length+')</h3>';
+    h+='<div style="max-height:180px;overflow-y:auto">';
+    var nwShow=nw.slice(0,15);
+    for(var ni=0;ni<nwShow.length;ni++){
+      h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:12px">';
+      h+='<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(nwShow[ni].name)+'</span>';
+      h+='<button style="padding:2px 6px;border:1px solid rgba(196,112,75,0.27);border-radius:6px;background:rgba(196,112,75,0.07);color:#C4704B;font-size:10px;cursor:pointer;font-weight:600" onclick="window._don(\''+nwShow[ni].id+'\')">Donate</button></div>';
+    }
+    h+='</div></div>';
+  }
+  return h;
 }
 
-// ─── Settings ───
-function Settings({dispatch}) {
-  const [confirmReset,setConfirmReset]=useState(false);
-  return <div style={{background:C.card,borderRadius:"14px",padding:"18px",border:`1px solid ${C.border}`}}>
-    <h3 style={{margin:"0 0 14px",fontSize:"14px",color:C.text,fontFamily:"'DM Sans',sans-serif"}}>⚙️ Settings</h3>
-    <p style={{fontSize:"12px",color:C.textMuted,marginBottom:"14px"}}>Your data saves automatically to this device using localStorage. ✨</p>
-    <p style={{fontSize:"12px",color:C.textMuted,marginBottom:"14px"}}>💡 <strong>Workflow:</strong> Log outfits & manage items here daily. Chat with Claude to sync updates to memory.</p>
-    {!confirmReset?
-      <button onClick={()=>setConfirmReset(true)} style={{padding:"9px 18px",background:`${C.danger}15`,color:C.danger,border:`1px solid ${C.danger}40`,borderRadius:"10px",fontSize:"13px",fontWeight:600,cursor:"pointer",fontFamily:"'DM Sans',sans-serif"}}>
-        🔄 Reset to Original Data
-      </button>
-    :<div>
-      <p style={{fontSize:"12px",color:C.danger,marginBottom:"10px"}}>⚠️ This will reset everything to the original 53 items and 5 outfits. Are you sure?</p>
-      <div style={{display:"flex",gap:"8px"}}>
-        <button onClick={()=>{dispatch({type:"RESET"});setConfirmReset(false);}} style={{padding:"9px 18px",background:C.danger,color:"#fff",border:"none",borderRadius:"10px",fontSize:"13px",fontWeight:600,cursor:"pointer"}}>Yes, Reset</button>
-        <button onClick={()=>setConfirmReset(false)} style={{padding:"9px 18px",background:C.border,color:C.text,border:"none",borderRadius:"10px",fontSize:"13px",fontWeight:600,cursor:"pointer"}}>Cancel</button>
-      </div>
-    </div>}
-  </div>;
+function rSet(){
+  var h='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Settings</h3>';
+  h+='<p style="font-size:12px;color:#8A7968;margin-bottom:10px">Data saves automatically to this device.</p>';
+  h+='<p style="font-size:12px;color:#8A7968;margin-bottom:10px">Log outfits here daily. Chat with Claude to sync updates.</p>';
+  h+='<button class="bt" style="background:rgba(196,91,91,0.1);color:#C45B5B;border:1px solid rgba(196,91,91,0.27)" onclick="window._reset()">Reset to Original</button></div>';
+  return h;
 }
 
-// ─── Main ───
-function App() {
-  const {state,dispatch,loaded,saveStatus}=usePersistedState();
-  const [tab,setTab]=useState("dashboard");
-  const keepCount=state.items.filter(i=>i.status==="keeping").length;
+// Actions
+window.T=function(t){tab=t;R()};
+window._invQ=function(v){invQ=v;R()};
+window._invS=function(v){invS=v;R()};
+window._invC=function(v){invC=v;invSub="all";R()};
+window._invSub=function(v){invSub=v;R()};
+window._togAdd=function(){showAdd=!showAdd;editId=null;formN="";formCat="Tops";formSub="";formSt="keeping";formNo="";R()};
+window._fN=function(v){formN=v};
+window._fCat=function(v){formCat=v;formSub="";R()};
+window._fSub=function(v){formSub=v};
+window._fSt=function(v){formSt=v};
+window._fNo=function(v){formNo=v};
+window._submit=function(){
+  if(!formN.trim())return;
+  if(editId){
+    var it=st.items.find(function(i){return i.id===editId});
+    if(it){it.name=formN;it.category=formCat;it.subcategory=formSub;it.status=formSt;it.notes=formNo}
+  }else{
+    st.items.push({id:"item-"+Date.now()+"-"+Math.random().toString(36).slice(2,6),name:formN,category:formCat,subcategory:formSub,status:formSt,notes:formNo,wornCount:0,lastWorn:null});
+  }
+  showAdd=false;editId=null;formN="";formCat="Tops";formSub="";formSt="keeping";formNo="";
+  save();R();
+};
+window._edit=function(id){
+  var it=st.items.find(function(i){return i.id===id});
+  if(!it)return;
+  formN=it.name;formCat=it.category;formSub=it.subcategory||"";formSt=it.status;formNo=it.notes||"";
+  editId=id;showAdd=true;R();
+};
+window._wear=function(id){
+  var it=st.items.find(function(i){return i.id===id});
+  if(it){it.wornCount=(it.wornCount||0)+1;it.lastWorn=td()}
+  save();R();
+};
+window._don=function(id){
+  if(!confirm("Donate this item?"))return;
+  st.items=st.items.filter(function(i){return i.id!==id});
+  st.donated++;save();R();
+};
+window._oV=function(v){oView=v;R()};
+window._oFC=function(v){oFC=v;R()};
+window._oTog=function(id){var idx=oSel.indexOf(id);if(idx>=0)oSel.splice(idx,1);else oSel.push(id);R()};
+window._oLog=function(){
+  if(!oSel.length)return;
+  st.outfits.push({id:"o-"+Date.now(),name:oName||"Outfit #"+(st.outfits.length+1),type:oType,date:td(),itemIds:oSel.slice(),notes:oNotes});
+  oSel.forEach(function(id){var it=st.items.find(function(i){return i.id===id});if(it){it.wornCount=(it.wornCount||0)+1;it.lastWorn=td()}});
+  oSel=[];oName="";oNotes="";save();R();
+};
+window._reset=function(){if(!confirm("Reset everything?"))return;st=makeDef();save();R()};
 
-  if(!loaded) return <div style={{minHeight:"100vh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'DM Sans',sans-serif"}}>
-    <div style={{textAlign:"center"}}><div style={{fontSize:"40px",marginBottom:"12px"}}>👗</div><div style={{color:C.textMuted}}>Loading your wardrobe...</div></div>
-  </div>;
+R();
 
-  return <div style={{minHeight:"100vh",background:C.bg,fontFamily:"'DM Sans',sans-serif",color:C.text}}>
-    <div style={{background:`linear-gradient(135deg,${C.accent},${C.warm})`,padding:"22px 22px 14px",borderRadius:"0 0 22px 22px",position:"relative"}}>
-      <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
-        <span style={{fontSize:"26px"}}>👗</span>
-        <div>
-          <h1 style={{margin:0,fontSize:"20px",fontWeight:700,color:"#fff",fontFamily:"'Playfair Display',serif"}}>Anna's Wardrobe Tracker</h1>
-          <p style={{margin:"2px 0 0",fontSize:"11px",color:"rgba(255,255,255,0.8)"}}>Capsule-Lite Journey • {keepCount} items • {state.donatedCount} donated</p>
-        </div>
-      </div>
-      {saveStatus==="saved"&&<div style={{position:"absolute",top:"8px",right:"12px",fontSize:"10px",color:"rgba(255,255,255,0.7)",display:"flex",alignItems:"center",gap:"4px"}}><span style={{color:"#7EE89E"}}>●</span> Saved</div>}
-    </div>
-    <div style={{display:"flex",overflowX:"auto",background:C.card,borderBottom:`1px solid ${C.border}`,paddingLeft:"6px"}}>
-      <TabBtn active={tab==="dashboard"} onClick={()=>setTab("dashboard")}>📊 Dashboard</TabBtn>
-      <TabBtn active={tab==="inventory"} onClick={()=>setTab("inventory")} count={state.items.length}>👚 Inventory</TabBtn>
-      <TabBtn active={tab==="outfits"} onClick={()=>setTab("outfits")} count={state.outfits.length}>👗 Outfits</TabBtn>
-      <TabBtn active={tab==="settings"} onClick={()=>setTab("settings")}>⚙️</TabBtn>
-    </div>
-    <div style={{padding:"18px",maxWidth:"800px",margin:"0 auto"}}>
-      {tab==="dashboard"&&<Dashboard state={state}/>}
-      {tab==="inventory"&&<Inventory state={state} dispatch={dispatch}/>}
-      {tab==="outfits"&&<Outfits state={state} dispatch={dispatch}/>}
-      {tab==="settings"&&<Settings dispatch={dispatch}/>}
-    </div>
-  </div>;
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+})();
 </script>
 </body>
 </html>
