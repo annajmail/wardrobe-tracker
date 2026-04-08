@@ -124,8 +124,8 @@ var DEF_OUTFITS=[
   {id:"outfit-5",name:"Casual Outfit #5",type:"casual",date:"2026-03-24",itemIds:["item-12","item-0","item-43","item-48"],notes:""}
 ];
 
-var CATS={"Tops":[25],"Bottoms":[8],"Outerwear":[5],"Shoes":[8]};
-var CATK=["Tops","Bottoms","Outerwear","Shoes"];
+var CATS={"Tanks":[3],"T-Shirts":[7],"Button Ups":[6],"Sweaters":[10],"Blouses":[3],"Sweatshirts":[3],"Jeans":[5],"Pants":[2],"Blazers":[4],"Boots":[4],"Sneakers":[3],"Flats":[3]};
+var CATK=["Tanks","T-Shirts","Button Ups","Sweaters","Blouses","Sweatshirts","Jeans","Pants","Blazers","Boots","Sneakers","Flats"];
 var SUBS={"Tops":["Tanks","T-Shirts","Button Ups","Sweaters","Blouses","Sweatshirts"],"Bottoms":["Jeans","Pants"],"Outerwear":["Blazers","Coats","Jackets"],"Shoes":["Boots","Sneakers","Flats","Heels"]};
 
 var st,tab="dashboard",invS="all",invC="all",invSub="all",invQ="",showAdd=false,editId=null;
@@ -199,7 +199,7 @@ function rDash(keep){
   h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Capsule-Lite Targets</h3>';
   h+='<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">';
   for(var j=0;j<CATK.length;j++){
-    var c=CATK[j],cur=keep.filter(function(x){return x.category===c}).length,tgt=CATS[c][0];
+    var c=CATK[j],cur=keep.filter(function(x){return x.subcategory===c}).length,tgt=CATS[c][0];
     h+=rRing(cur,tgt,c);
   }
   h+='</div></div>';
@@ -229,38 +229,35 @@ function rRing(cur,tgt,label){
 function rInv(){
   var items=st.items.filter(function(i){
     if(invS!=="all"&&i.status!==invS)return false;
-    if(invC!=="all"&&i.category!==invC)return false;
     if(invSub!=="all"&&i.subcategory!==invSub)return false;
     if(invQ&&i.name.toLowerCase().indexOf(invQ.toLowerCase())<0)return false;
     return true;
   });
-  var asubs=invC!=="all"?(SUBS[invC]||[]):[];
+  var allSubs=[];
+  var parentCats=["Tops","Bottoms","Outerwear","Shoes"];
+  for(var ak=0;ak<parentCats.length;ak++){var ss=SUBS[parentCats[ak]]||[];for(var as2=0;as2<ss.length;as2++){allSubs.push(ss[as2])}}
 
   var h='<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center">';
   h+='<input class="ip" style="flex:1;min-width:90px" placeholder="Search..." value="'+esc(invQ)+'" oninput="window._invQ(this.value)">';
   h+='<select class="ip" style="width:auto" onchange="window._invS(this.value)">';
   h+='<option value="all"'+(invS==="all"?" selected":"")+'>All</option><option value="keeping"'+(invS==="keeping"?" selected":"")+'>Keep</option><option value="donating"'+(invS==="donating"?" selected":"")+'>Donate</option><option value="maybe"'+(invS==="maybe"?" selected":"")+'>Maybe</option></select>';
-  h+='<select class="ip" style="width:auto" onchange="window._invC(this.value)">';
-  h+='<option value="all">All Cat</option>';
-  for(var ci=0;ci<CATK.length;ci++)h+='<option value="'+CATK[ci]+'"'+(invC===CATK[ci]?" selected":"")+'>'+CATK[ci]+'</option>';
-  h+='</select>';
-  if(asubs.length){
-    h+='<select class="ip" style="width:auto" onchange="window._invSub(this.value)"><option value="all">All Sub</option>';
-    for(var si=0;si<asubs.length;si++)h+='<option value="'+asubs[si]+'"'+(invSub===asubs[si]?" selected":"")+'>'+asubs[si]+'</option>';
-    h+='</select>';
+  h+='<select class="ip" style="width:auto" onchange="window._invSub(this.value)">';
+  h+='<option value="all">All Types</option>';
+  for(var ci=0;ci<allSubs.length;ci++){
+    var hasSub=st.items.some(function(x){return x.subcategory===allSubs[ci]});
+    if(hasSub)h+='<option value="'+allSubs[ci]+'"'+(invSub===allSubs[ci]?" selected":"")+'>'+allSubs[ci]+'</option>';
   }
+  h+='</select>';
   h+='<button class="bt ba" onclick="window._togAdd()">'+(showAdd?"Cancel":"+ Add")+'</button></div>';
 
   if(showAdd){
     var fsubs=SUBS[formCat]||[];
+    var allFormSubs=[];for(var afk=0;afk<["Tops","Bottoms","Outerwear","Shoes"].length;afk++){var fss=SUBS[["Tops","Bottoms","Outerwear","Shoes"][afk]]||[];for(var afs=0;afs<fss.length;afs++){allFormSubs.push(fss[afs])}}
     h+='<div class="cd"><h4 style="margin:0 0 8px;font-size:14px">'+(editId?"Edit Item":"New Item")+'</h4>';
     h+='<div class="g2">';
     h+='<input class="ip" style="grid-column:1/-1" placeholder="Item name" value="'+esc(formN)+'" oninput="window._fN(this.value)">';
-    h+='<select class="ip" onchange="window._fCat(this.value)">';
-    for(var fi=0;fi<CATK.length;fi++)h+='<option value="'+CATK[fi]+'"'+(formCat===CATK[fi]?" selected":"")+'>'+CATK[fi]+'</option>';
-    h+='</select>';
-    h+='<select class="ip" onchange="window._fSub(this.value)"><option value="">Sub...</option>';
-    for(var fsi=0;fsi<fsubs.length;fsi++)h+='<option value="'+fsubs[fsi]+'"'+(formSub===fsubs[fsi]?" selected":"")+'>'+fsubs[fsi]+'</option>';
+    h+='<select class="ip" onchange="window._fSub(this.value)"><option value="">Type...</option>';
+    for(var fsi=0;fsi<allFormSubs.length;fsi++)h+='<option value="'+allFormSubs[fsi]+'"'+(formSub===allFormSubs[fsi]?" selected":"")+'>'+allFormSubs[fsi]+'</option>';
     h+='</select>';
     h+='<select class="ip" onchange="window._fSt(this.value)"><option value="keeping"'+(formSt==="keeping"?" selected":"")+'>Keeping</option><option value="donating"'+(formSt==="donating"?" selected":"")+'>Donating</option><option value="maybe"'+(formSt==="maybe"?" selected":"")+'>Maybe</option></select>';
     h+='<input class="ip" placeholder="Notes" value="'+esc(formNo)+'" oninput="window._fNo(this.value)">';
@@ -285,7 +282,7 @@ function rInv(){
 }
 
 function rOut(keep){
-  var disp=oFC==="all"?keep:keep.filter(function(i){return i.category===oFC});
+  var disp=oFC==="all"?keep:keep.filter(function(i){return i.subcategory===oFC});
   var h='<div style="display:flex;gap:6px;margin-bottom:12px">';
   var vws=[["log","+ Log"],["history","History"],["stats","Stats"]];
   for(var vi=0;vi<vws.length;vi++){
@@ -304,9 +301,10 @@ function rOut(keep){
     h+='<input class="ip" style="margin-bottom:8px" placeholder="Notes" value="'+esc(oNotes)+'" oninput="oNotes=this.value">';
 
     h+='<div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">';
-    var fcats=["all"].concat(CATK);
-    for(var fi=0;fi<fcats.length;fi++){
-      h+='<button class="gh'+(oFC===fcats[fi]?" on":"")+'" style="padding:3px 10px;font-size:11px" onclick="window._oFC(\''+fcats[fi]+'\')">'+fcats[fi]+'</button>';
+    var usedSubs={};keep.forEach(function(i){if(i.subcategory)usedSubs[i.subcategory]=true});
+    var oSubKeys=["all"].concat(Object.keys(usedSubs).sort());
+    for(var fi=0;fi<oSubKeys.length;fi++){
+      h+='<button class="gh'+(oFC===oSubKeys[fi]?" on":"")+'" style="padding:3px 10px;font-size:11px" onclick="window._oFC(\''+oSubKeys[fi]+'\')">'+oSubKeys[fi]+'</button>';
     }
     h+='</div>';
 
@@ -386,11 +384,13 @@ window._fSt=function(v){formSt=v};
 window._fNo=function(v){formNo=v};
 window._submit=function(){
   if(!formN.trim())return;
+  var subToCat={"Tanks":"Tops","T-Shirts":"Tops","Button Ups":"Tops","Sweaters":"Tops","Blouses":"Tops","Sweatshirts":"Tops","Jeans":"Bottoms","Pants":"Bottoms","Blazers":"Outerwear","Coats":"Outerwear","Jackets":"Outerwear","Boots":"Shoes","Sneakers":"Shoes","Flats":"Shoes","Heels":"Shoes"};
+  var autoCat=subToCat[formSub]||formCat;
   if(editId){
     var it=st.items.find(function(i){return i.id===editId});
-    if(it){it.name=formN;it.category=formCat;it.subcategory=formSub;it.status=formSt;it.notes=formNo}
+    if(it){it.name=formN;it.category=autoCat;it.subcategory=formSub;it.status=formSt;it.notes=formNo}
   }else{
-    st.items.push({id:"item-"+Date.now()+"-"+Math.random().toString(36).slice(2,6),name:formN,category:formCat,subcategory:formSub,status:formSt,notes:formNo,wornCount:0,lastWorn:null});
+    st.items.push({id:"item-"+Date.now()+"-"+Math.random().toString(36).slice(2,6),name:formN,category:autoCat,subcategory:formSub,status:formSt,notes:formNo,wornCount:0,lastWorn:null});
   }
   showAdd=false;editId=null;formN="";formCat="Tops";formSub="";formSt="keeping";formNo="";
   save();R();
