@@ -47,6 +47,9 @@ button,select,input{font-family:'DM Sans',sans-serif;font-size:13px}
 .ot{padding:2px 7px;background:#fff;border-radius:6px;font-size:10px;color:#3D2E1F;border:1px solid #E8DDD0;display:inline-block;margin:2px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .fw{display:flex;flex-wrap:wrap;gap:8px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);margin-right:2px;vertical-align:middle}
+.dot-lg{width:22px;height:22px;border:2px solid #E8DDD0;cursor:pointer;margin:3px}
+.dot-lg.on{border-color:#C4704B;box-shadow:0 0 0 2px rgba(196,112,75,0.2)}
 </style>
 </head>
 <body>
@@ -71,8 +74,8 @@ var ITEMS=[
 ["Light brown/gray flannel button up","Tops","Button Ups",0],
 ["Buffalo plaid button up","Tops","Button Ups",0],
 ["Dark green plaid button up","Tops","Button Ups",0],
-["Black LS scoop Good American","Tops","Sweaters",0],
-["Black Torrid v-neck LS","Tops","Sweaters",0],
+["Black LS scoop Good American","Tops","Long Sleeves",0],
+["Black Torrid v-neck LS","Tops","Long Sleeves",0],
 ["Amazon lightweight black sweater","Tops","Sweaters",0],
 ["Black 3/4 sleeve scallop sweater","Tops","Sweaters",0],
 ["V-neck black Torrid sweater","Tops","Sweaters",0],
@@ -83,7 +86,7 @@ var ITEMS=[
 ["Gray LS sweater bronze buttons","Tops","Sweaters",0],
 ["Torrid blue/white striped sweater","Tops","Sweaters",0],
 ["Navy Inspire crew neck sweater","Tops","Sweaters",0],
-["Green We Wander LS","Tops","Sweaters",0],
+["Green We Wander LS","Tops","Long Sleeves",0],
 ["Corduroy pullover","Tops","Sweaters",0],
 ["White blouse","Tops","Blouses",0],
 ["Dark green blouse","Tops","Blouses",0],
@@ -124,13 +127,29 @@ var DEF_OUTFITS=[
   {id:"outfit-5",name:"Casual Outfit #5",type:"casual",date:"2026-03-24",itemIds:["item-12","item-0","item-43","item-48"],notes:""}
 ];
 
-var CATS={"Tanks":[3],"T-Shirts":[7],"Button Ups":[6],"Sweaters":[10],"Blouses":[3],"Sweatshirts":[3],"Jeans":[5],"Pants":[2],"Blazers":[4],"Boots":[4],"Sneakers":[3],"Flats":[3]};
-var CATK=["Tanks","T-Shirts","Button Ups","Sweaters","Blouses","Sweatshirts","Jeans","Pants","Blazers","Boots","Sneakers","Flats"];
-var SUBS={"Tops":["Tanks","T-Shirts","Button Ups","Sweaters","Blouses","Sweatshirts"],"Bottoms":["Jeans","Pants"],"Outerwear":["Blazers","Coats","Jackets"],"Shoes":["Boots","Sneakers","Flats","Heels"]};
+var CATS={"Tanks":[3],"T-Shirts":[7],"Button Ups":[6],"Long Sleeves":[4],"Sweaters":[10],"Blouses":[3],"Sweatshirts":[3],"Jeans":[5],"Pants":[2],"Blazers":[4],"Boots":[4],"Sneakers":[3],"Flats":[3]};
+var CATK=["Tanks","T-Shirts","Button Ups","Long Sleeves","Sweaters","Blouses","Sweatshirts","Jeans","Pants","Blazers","Boots","Sneakers","Flats"];
+var SUBS={"Tops":["Tanks","T-Shirts","Button Ups","Long Sleeves","Sweaters","Blouses","Sweatshirts"],"Bottoms":["Jeans","Pants"],"Outerwear":["Blazers","Coats","Jackets"],"Shoes":["Boots","Sneakers","Flats","Heels"]};
 
-var st,tab="dashboard",invS="all",invC="all",invSub="all",invQ="",showAdd=false,editId=null;
-var formN="",formCat="Tops",formSub="",formSt="keeping",formNo="";
-var oView="log",oSel=[],oName="",oType="casual",oNotes="",oFC="all";
+var st,tab="dashboard",invS="all",invC="all",invSub="all",invQ="",invCol="all",showAdd=false,editId=null;
+var formN="",formCat="Tops",formSub="",formSt="keeping",formNo="",formCols=[];
+
+var COLORS={"Black":"#000000","White":"#FFFFFF","Gray":"#9E9E9E","Cream":"#F5E6C8","Tan":"#D2B48C","Brown":"#6B4423","Navy":"#1B2951","Blue":"#4A90D9","Teal":"#4A9B9B","Green":"#5B8C5A","Purple":"#7B5B8C","Pink":"#D9849B","Red":"#C94C4C","Yellow":"#E8C547","Multi":"#D4A574"};
+var COLOR_KEYS=Object.keys(COLORS);
+
+function detectColors(name){
+  var n=" "+name.toLowerCase().replace(/[\/\-,\.]/g," ")+" ";
+  var found=[];
+  var map={"black":"Black","white":"White","gray":"Gray","grey":"Gray","cream":"Cream","tan":"Tan","brown":"Brown","navy":"Navy","blue":"Blue","teal":"Teal","green":"Green","mint":"Green","purple":"Purple","pink":"Pink","red":"Red","yellow":"Yellow","chambray":"Blue","denim":"Blue"};
+  for(var k in map){if(n.indexOf(" "+k+" ")>=0&&found.indexOf(map[k])<0)found.push(map[k])}
+  if(n.indexOf("leopard")>=0){found=["Black","Brown","Tan"]}
+  if(n.indexOf("buffalo plaid")>=0){if(found.indexOf("Red")<0)found.push("Red");if(found.indexOf("Black")<0)found.push("Black")}
+  if(n.indexOf("dark wash")>=0&&found.indexOf("Blue")<0)found.push("Blue");
+  if(n.indexOf("light wash")>=0&&found.indexOf("Blue")<0)found.push("Blue");
+  return found;
+}
+var oView="log",oSel=[],oName="",oType="casual",oNotes="",oFC="all",oDate="",planDate="",planSel=[],planName="",planType="casual";
+var pendingDel=null,wearAgainId=null,wearAgainDate="";
 
 function makeDef(){return{items:makeItems(),outfits:DEF_OUTFITS.map(function(o){return JSON.parse(JSON.stringify(o))}),donated:25}}
 
@@ -138,12 +157,29 @@ function load(){try{var s=localStorage.getItem("wt5");if(s)return JSON.parse(s)}
 function save(){try{localStorage.setItem("wt5",JSON.stringify(st))}catch(e){}}
 
 st=load()||makeDef();
+if(!st.planned)st.planned=[];
+// Migrate LS items from Sweaters to Long Sleeves
+st.items.forEach(function(i){if(i.subcategory==="Sweaters"&&/\bLS\b/.test(i.name)){i.subcategory="Long Sleeves"}});
+st.outfits.forEach(function(o){if(!o.wearDates){o.wearDates=[o.date||td()]}});
+// Migrate items to have colors array (auto-detect from name)
+st.items.forEach(function(i){if(!i.colors){i.colors=detectColors(i.name)}});
+save();
 
 function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 function td(){return new Date().toISOString().slice(0,10)}
 
 function bgc(s){return s==="keeping"?"bg bg-k":s==="donating"?"bg bg-d":"bg bg-m"}
 function bgt(s){return s==="keeping"?"Keep":s==="donating"?"Donate":"Maybe"}
+
+function rDots(cols){
+  if(!cols||!cols.length)return "";
+  var h="";
+  for(var d=0;d<cols.length;d++){
+    var c=COLORS[cols[d]]||"#ccc";
+    h+='<span class="dot" style="background:'+c+'" title="'+cols[d]+'"></span>';
+  }
+  return h;
+}
 
 function R(){
   var keep=st.items.filter(function(i){return i.status==="keeping"});
@@ -230,6 +266,7 @@ function rInv(){
   var items=st.items.filter(function(i){
     if(invS!=="all"&&i.status!==invS)return false;
     if(invSub!=="all"&&i.subcategory!==invSub)return false;
+    if(invCol!=="all"&&(!i.colors||i.colors.indexOf(invCol)<0))return false;
     if(invQ&&i.name.toLowerCase().indexOf(invQ.toLowerCase())<0)return false;
     return true;
   });
@@ -248,6 +285,13 @@ function rInv(){
     if(hasSub)h+='<option value="'+allSubs[ci]+'"'+(invSub===allSubs[ci]?" selected":"")+'>'+allSubs[ci]+'</option>';
   }
   h+='</select>';
+  h+='<select class="ip" style="width:auto" onchange="window._invCol(this.value)">';
+  h+='<option value="all">All Colors</option>';
+  for(var cki=0;cki<COLOR_KEYS.length;cki++){
+    var colHas=st.items.some(function(x){return x.colors&&x.colors.indexOf(COLOR_KEYS[cki])>=0});
+    if(colHas)h+='<option value="'+COLOR_KEYS[cki]+'"'+(invCol===COLOR_KEYS[cki]?" selected":"")+'>'+COLOR_KEYS[cki]+'</option>';
+  }
+  h+='</select>';
   h+='<button class="bt ba" onclick="window._togAdd()">'+(showAdd?"Cancel":"+ Add")+'</button></div>';
 
   if(showAdd){
@@ -261,7 +305,16 @@ function rInv(){
     h+='</select>';
     h+='<select class="ip" onchange="window._fSt(this.value)"><option value="keeping"'+(formSt==="keeping"?" selected":"")+'>Keeping</option><option value="donating"'+(formSt==="donating"?" selected":"")+'>Donating</option><option value="maybe"'+(formSt==="maybe"?" selected":"")+'>Maybe</option></select>';
     h+='<input class="ip" placeholder="Notes" value="'+esc(formNo)+'" oninput="window._fNo(this.value)">';
-    h+='</div><button class="bt bs" style="margin-top:8px" onclick="window._submit()">'+(editId?"Save":"Add")+'</button></div>';
+    h+='</div>';
+    h+='<div style="margin-top:10px"><div style="font-size:11px;color:#8A7968;margin-bottom:4px">Colors:</div>';
+    h+='<div style="display:flex;flex-wrap:wrap">';
+    for(var cpi=0;cpi<COLOR_KEYS.length;cpi++){
+      var ck=COLOR_KEYS[cpi];
+      var on=formCols.indexOf(ck)>=0;
+      h+='<span class="dot dot-lg'+(on?" on":"")+'" style="background:'+COLORS[ck]+'" title="'+ck+'" onclick="window._fCol(\''+ck+'\')"></span>';
+    }
+    h+='</div></div>';
+    h+='<button class="bt bs" style="margin-top:10px" onclick="window._submit()">'+(editId?"Save":"Add")+'</button></div>';
   }
 
   h+='<div style="font-size:11px;color:#8A7968;margin-bottom:6px">'+items.length+' item'+(items.length!==1?"s":"")+'</div>';
@@ -269,12 +322,18 @@ function rInv(){
   for(var ii=0;ii<items.length;ii++){
     var it=items[ii];
     h+='<div class="row">';
-    h+='<div style="flex:1;min-width:0"><div class="nm">'+esc(it.name)+'</div>';
+    h+='<div style="flex:1;min-width:0"><div class="nm">'+rDots(it.colors)+' '+esc(it.name)+'</div>';
     h+='<div class="sm">'+(it.subcategory||it.category)+(it.wornCount>0?" - "+it.wornCount+"x":"")+'</div></div>';
     h+='<span class="'+bgc(it.status)+'">'+bgt(it.status)+'</span>';
-    if(it.status==="keeping")h+='<button class="sm-b" onclick="window._wear(\''+it.id+'\')">+1</button>';
-    h+='<button class="sm-b" onclick="window._edit(\''+it.id+'\')">&#9998;</button>';
-    if(it.status==="keeping")h+='<button class="sm-b" style="border-color:rgba(196,112,75,0.27)" onclick="window._don(\''+it.id+'\')">&#10005;</button>';
+    if(pendingDel===it.id){
+      h+='<button class="sm-b" style="background:#C45B5B;color:#fff;border-color:#C45B5B;width:auto;padding:0 10px" onclick="window._delConfirm(\''+it.id+'\')">Delete?</button>';
+      h+='<button class="sm-b" onclick="window._delCancel()">Cancel</button>';
+    }else{
+      if(it.status==="keeping")h+='<button class="sm-b" onclick="window._wear(\''+it.id+'\')">+1</button>';
+      h+='<button class="sm-b" onclick="window._edit(\''+it.id+'\')">&#9998;</button>';
+      if(it.status==="keeping")h+='<button class="sm-b" style="border-color:rgba(196,112,75,0.27)" title="Donate" onclick="window._don(\''+it.id+'\')">&#x1F4E6;</button>';
+      h+='<button class="sm-b" style="border-color:rgba(196,91,91,0.3)" title="Delete" onclick="window._delStart(\''+it.id+'\')">&#10005;</button>';
+    }
     h+='</div>';
   }
   if(!items.length)h+='<div style="text-align:center;padding:30px;color:#8A7968">No items found</div>';
@@ -283,21 +342,24 @@ function rInv(){
 
 function rOut(keep){
   var disp=oFC==="all"?keep:keep.filter(function(i){return i.subcategory===oFC});
-  var h='<div style="display:flex;gap:6px;margin-bottom:12px">';
-  var vws=[["log","+ Log"],["history","History"],["stats","Stats"]];
+  var h='<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">';
+  var vws=[["log","+ Log"],["plan","Plan"],["history","History"],["stats","Stats"]];
   for(var vi=0;vi<vws.length;vi++){
     h+='<button class="gh'+(oView===vws[vi][0]?" on":"")+'" onclick="window._oV(\''+vws[vi][0]+'\')">'+vws[vi][1]+'</button>';
   }
   h+='</div>';
 
   if(oView==="log"){
+    if(!oDate)oDate=td();
     h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Log Today\'s Outfit</h3>';
     h+='<div class="g2" style="margin-bottom:8px">';
     h+='<input class="ip" placeholder="Outfit name" value="'+esc(oName)+'" oninput="oName=this.value">';
-    h+='<select class="ip" onchange="oType=this.value">';
+    h+='<input class="ip" type="date" value="'+oDate+'" onchange="window._oDate(this.value)">';
+    h+='</div>';
+    h+='<select class="ip" style="margin-bottom:8px" onchange="oType=this.value">';
     var ots=["work","casual","date night","weekend","other"];
     for(var oi=0;oi<ots.length;oi++)h+='<option value="'+ots[oi]+'"'+(oType===ots[oi]?" selected":"")+'>'+ots[oi]+'</option>';
-    h+='</select></div>';
+    h+='</select>';
     h+='<input class="ip" style="margin-bottom:8px" placeholder="Notes" value="'+esc(oNotes)+'" oninput="oNotes=this.value">';
 
     h+='<div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">';
@@ -311,22 +373,84 @@ function rOut(keep){
     h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;max-height:200px;overflow-y:auto">';
     for(var di=0;di<disp.length;di++){
       var on=oSel.indexOf(disp[di].id)>=0;
-      h+='<button class="pl'+(on?" on":"")+'" onclick="window._oTog(\''+disp[di].id+'\')">'+esc(disp[di].name)+'</button>';
+      h+='<button class="pl'+(on?" on":"")+'" onclick="window._oTog(\''+disp[di].id+'\')">'+rDots(disp[di].colors)+' '+esc(disp[di].name)+'</button>';
     }
     h+='</div>';
     h+='<button class="bt ba" '+(oSel.length?'':'disabled style="opacity:0.5"')+' onclick="window._oLog()">Log Outfit ('+oSel.length+')</button></div>';
   }
 
+  if(oView==="plan"){
+    if(!planDate){var t=new Date();t.setDate(t.getDate()+1);planDate=t.toISOString().slice(0,10)}
+    h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Plan an Outfit</h3>';
+    h+='<div class="g2" style="margin-bottom:8px">';
+    h+='<input class="ip" placeholder="Plan name (optional)" value="'+esc(planName)+'" oninput="planName=this.value">';
+    h+='<input class="ip" type="date" value="'+planDate+'" onchange="planDate=this.value">';
+    h+='</div>';
+    h+='<select class="ip" style="margin-bottom:8px" onchange="planType=this.value">';
+    var pts=["work","casual","date night","weekend","other"];
+    for(var pi=0;pi<pts.length;pi++)h+='<option value="'+pts[pi]+'"'+(planType===pts[pi]?" selected":"")+'>'+pts[pi]+'</option>';
+    h+='</select>';
+    h+='<div style="font-size:11px;color:#8A7968;margin-bottom:6px">Pick items:</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;max-height:180px;overflow-y:auto">';
+    for(var pdi=0;pdi<keep.length;pdi++){
+      var pon=planSel.indexOf(keep[pdi].id)>=0;
+      h+='<button class="pl'+(pon?" on":"")+'" onclick="window._pTog(\''+keep[pdi].id+'\')">'+rDots(keep[pdi].colors)+' '+esc(keep[pdi].name)+'</button>';
+    }
+    h+='</div>';
+    h+='<button class="bt ba" '+(planSel.length?'':'disabled style="opacity:0.5"')+' onclick="window._pSave()">Save Plan ('+planSel.length+')</button></div>';
+
+    // Upcoming 3 days
+    h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Upcoming Plans</h3>';
+    var upcoming=(st.planned||[]).filter(function(p){return p.date>=td()}).sort(function(a,b){return a.date<b.date?-1:1}).slice(0,3);
+    if(!upcoming.length)h+='<div style="text-align:center;padding:14px;color:#8A7968;font-size:12px">No plans yet</div>';
+    for(var ui=0;ui<upcoming.length;ui++){
+      var pl=upcoming[ui];
+      h+='<div class="oc"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
+      h+='<div><span style="font-weight:600;font-size:13px">'+esc(pl.name)+'</span>';
+      if(pl.type)h+=' <span class="bg bg-'+(pl.type==="work"?"w":"c")+'">'+pl.type+'</span></div>';
+      h+='<div style="display:flex;gap:4px;align-items:center"><span style="font-size:10px;color:#8A7968">'+pl.date+'</span>';
+      h+='<button class="sm-b" style="width:24px;height:24px;font-size:11px" onclick="window._pWear(\''+pl.id+'\')">OK</button>';
+      h+='<button class="sm-b" style="width:24px;height:24px;font-size:11px;border-color:rgba(196,91,91,0.3)" onclick="window._pDel(\''+pl.id+'\')">X</button>';
+      h+='</div></div>';
+      for(var pii=0;pii<pl.itemIds.length;pii++){
+        var pit=st.items.find(function(x){return x.id===pl.itemIds[pii]});
+        if(pit)h+='<span class="ot">'+esc(pit.name)+'</span>';
+      }
+      h+='</div>';
+    }
+    h+='</div>';
+  }
+
   if(oView==="history"){
     h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">All Outfits ('+st.outfits.length+')</h3>';
-    var rev=st.outfits.slice().reverse();
-    for(var hi=0;hi<rev.length;hi++){
-      var o=rev[hi];
+    var sorted=st.outfits.slice().sort(function(a,b){
+      var ad=(a.wearDates&&a.wearDates[a.wearDates.length-1])||a.date||"";
+      var bd=(b.wearDates&&b.wearDates[b.wearDates.length-1])||b.date||"";
+      return ad<bd?1:-1;
+    });
+    for(var hi=0;hi<sorted.length;hi++){
+      var o=sorted[hi];
+      var wdd=o.wearDates||[o.date];
       h+='<div class="oc">';
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;flex-wrap:wrap;gap:4px">';
       h+='<div><span style="font-weight:600;font-size:13px">'+esc(o.name)+'</span>';
       if(o.type)h+=' <span class="bg bg-'+(o.type==="work"?"w":"c")+'">'+o.type+'</span>';
-      h+='</div><span style="font-size:10px;color:#8A7968">'+o.date+'</span></div>';
+      h+=' <span style="background:rgba(139,158,126,0.15);color:#8B9E7E;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:600">'+wdd.length+'x worn</span>';
+      h+='</div></div>';
+      if(wearAgainId===o.id){
+        h+='<div style="background:#fff;padding:8px;border-radius:8px;border:1px solid #C4704B;margin-bottom:6px">';
+        h+='<div style="font-size:11px;margin-bottom:5px">Date wore it again:</div>';
+        h+='<div style="display:flex;gap:5px"><input class="ip" type="date" value="'+wearAgainDate+'" onchange="wearAgainDate=this.value">';
+        h+='<button class="bt ba" style="padding:6px 12px;font-size:11px" onclick="window._oWearAgainSave(\''+o.id+'\')">Save</button>';
+        h+='<button class="bt" style="padding:6px 12px;font-size:11px;background:#E8DDD0;color:#8A7968" onclick="window._oWearAgainCancel()">Cancel</button>';
+        h+='</div></div>';
+      }else{
+        h+='<div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">';
+        h+='<button class="bt ba" style="padding:4px 10px;font-size:11px" onclick="window._oWearAgain(\''+o.id+'\')">+ Wore again</button>';
+        h+='<button class="bt bs" style="padding:4px 10px;font-size:11px" onclick="window._oToPlan(\''+o.id+'\')">Plan this</button>';
+        h+='</div>';
+      }
+      h+='<div style="font-size:10px;color:#8A7968;margin-bottom:4px">Last: '+wdd[wdd.length-1]+(wdd.length>1?" (and "+(wdd.length-1)+" more)":"")+'</div>';
       if(o.notes)h+='<div style="font-size:11px;color:#8A7968;margin-bottom:4px;font-style:italic">'+esc(o.notes)+'</div>';
       for(var oi2=0;oi2<o.itemIds.length;oi2++){
         var it2=st.items.find(function(x){return x.id===o.itemIds[oi2]});
@@ -340,7 +464,17 @@ function rOut(keep){
   if(oView==="stats"){
     var wd=keep.filter(function(i){return i.wornCount>0}).sort(function(a,b){return b.wornCount-a.wornCount}).slice(0,10);
     var nw=keep.filter(function(i){return!i.wornCount});
-    h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Most Worn</h3>';
+    var topOutfits=st.outfits.slice().sort(function(a,b){return((b.wearDates&&b.wearDates.length)||1)-((a.wearDates&&a.wearDates.length)||1)}).slice(0,5);
+    h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Most Worn Outfits</h3>';
+    if(topOutfits.length&&topOutfits[0].wearDates){for(var to=0;to<topOutfits.length;to++){
+      var tw=(topOutfits[to].wearDates&&topOutfits[to].wearDates.length)||1;
+      h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
+      h+='<span style="font-size:11px;font-weight:700;color:#8A7968;width:16px">#'+(to+1)+'</span>';
+      h+='<span style="flex:1;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(topOutfits[to].name)+'</span>';
+      h+='<span style="background:rgba(196,112,75,0.13);color:#C4704B;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:600">'+tw+'x</span></div>';
+    }}
+    h+='</div>';
+    h+='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Most Worn Items</h3>';
     if(wd.length){for(var wi=0;wi<wd.length;wi++){
       h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
       h+='<span style="font-size:11px;font-weight:700;color:#8A7968;width:16px">#'+(wi+1)+'</span>';
@@ -355,7 +489,7 @@ function rOut(keep){
     for(var ni=0;ni<nwShow.length;ni++){
       h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:12px">';
       h+='<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(nwShow[ni].name)+'</span>';
-      h+='<button style="padding:2px 6px;border:1px solid rgba(196,112,75,0.27);border-radius:6px;background:rgba(196,112,75,0.07);color:#C4704B;font-size:10px;cursor:pointer;font-weight:600" onclick="window._don(\''+nwShow[ni].id+'\')">Donate</button></div>';
+      h+='<button style="padding:2px 6px;border:1px solid rgba(196,112,75,0.27);border-radius:6px;background:rgba(196,112,75,0.07);color:#C4704B;font-size:10px;cursor:pointer;font-weight:600" onclick="window._don(\''+nwShow[ni].id+'\')">&#x1F4E6;</button></div>';
     }
     h+='</div></div>';
   }
@@ -376,7 +510,14 @@ window._invQ=function(v){invQ=v;R()};
 window._invS=function(v){invS=v;R()};
 window._invC=function(v){invC=v;invSub="all";R()};
 window._invSub=function(v){invSub=v;R()};
-window._togAdd=function(){showAdd=!showAdd;editId=null;formN="";formCat="Tops";formSub="";formSt="keeping";formNo="";R()};
+window._invCol=function(v){invCol=v;R()};
+window._fCol=function(c){
+  var idx=formCols.indexOf(c);
+  if(idx>=0)formCols.splice(idx,1);
+  else formCols.push(c);
+  R();
+};
+window._togAdd=function(){showAdd=!showAdd;editId=null;formN="";formCat="Tops";formSub="";formSt="keeping";formNo="";formCols=[];R()};
 window._fN=function(v){formN=v};
 window._fCat=function(v){formCat=v;formSub="";R()};
 window._fSub=function(v){formSub=v};
@@ -384,21 +525,22 @@ window._fSt=function(v){formSt=v};
 window._fNo=function(v){formNo=v};
 window._submit=function(){
   if(!formN.trim())return;
-  var subToCat={"Tanks":"Tops","T-Shirts":"Tops","Button Ups":"Tops","Sweaters":"Tops","Blouses":"Tops","Sweatshirts":"Tops","Jeans":"Bottoms","Pants":"Bottoms","Blazers":"Outerwear","Coats":"Outerwear","Jackets":"Outerwear","Boots":"Shoes","Sneakers":"Shoes","Flats":"Shoes","Heels":"Shoes"};
+  var subToCat={"Tanks":"Tops","T-Shirts":"Tops","Button Ups":"Tops","Long Sleeves":"Tops","Sweaters":"Tops","Blouses":"Tops","Sweatshirts":"Tops","Jeans":"Bottoms","Pants":"Bottoms","Blazers":"Outerwear","Coats":"Outerwear","Jackets":"Outerwear","Boots":"Shoes","Sneakers":"Shoes","Flats":"Shoes","Heels":"Shoes"};
   var autoCat=subToCat[formSub]||formCat;
   if(editId){
     var it=st.items.find(function(i){return i.id===editId});
-    if(it){it.name=formN;it.category=autoCat;it.subcategory=formSub;it.status=formSt;it.notes=formNo}
+    if(it){it.name=formN;it.category=autoCat;it.subcategory=formSub;it.status=formSt;it.notes=formNo;it.colors=formCols.slice()}
   }else{
-    st.items.push({id:"item-"+Date.now()+"-"+Math.random().toString(36).slice(2,6),name:formN,category:autoCat,subcategory:formSub,status:formSt,notes:formNo,wornCount:0,lastWorn:null});
+    st.items.push({id:"item-"+Date.now()+"-"+Math.random().toString(36).slice(2,6),name:formN,category:autoCat,subcategory:formSub,status:formSt,notes:formNo,colors:formCols.slice(),wornCount:0,lastWorn:null});
   }
-  showAdd=false;editId=null;formN="";formCat="Tops";formSub="";formSt="keeping";formNo="";
+  showAdd=false;editId=null;formN="";formCat="Tops";formSub="";formSt="keeping";formNo="";formCols=[];
   save();R();
 };
 window._edit=function(id){
   var it=st.items.find(function(i){return i.id===id});
   if(!it)return;
   formN=it.name;formCat=it.category;formSub=it.subcategory||"";formSt=it.status;formNo=it.notes||"";
+  formCols=(it.colors||[]).slice();
   editId=id;showAdd=true;R();
 };
 window._wear=function(id){
@@ -407,18 +549,66 @@ window._wear=function(id){
   save();R();
 };
 window._don=function(id){
-  if(!confirm("Donate this item?"))return;
   st.items=st.items.filter(function(i){return i.id!==id});
   st.donated++;save();R();
 };
+window._delStart=function(id){pendingDel=id;R()};
+window._delCancel=function(){pendingDel=null;R()};
+window._delConfirm=function(id){
+  st.items=st.items.filter(function(i){return i.id!==id});
+  pendingDel=null;save();R();
+};
 window._oV=function(v){oView=v;R()};
+window._oDate=function(v){oDate=v;R()};
 window._oFC=function(v){oFC=v;R()};
 window._oTog=function(id){var idx=oSel.indexOf(id);if(idx>=0)oSel.splice(idx,1);else oSel.push(id);R()};
 window._oLog=function(){
   if(!oSel.length)return;
-  st.outfits.push({id:"o-"+Date.now(),name:oName||"Outfit #"+(st.outfits.length+1),type:oType,date:td(),itemIds:oSel.slice(),notes:oNotes});
-  oSel.forEach(function(id){var it=st.items.find(function(i){return i.id===id});if(it){it.wornCount=(it.wornCount||0)+1;it.lastWorn=td()}});
-  oSel=[];oName="";oNotes="";save();R();
+  var wearDate=oDate||td();
+  st.outfits.push({id:"o-"+Date.now(),name:oName||"Outfit #"+(st.outfits.length+1),type:oType,date:wearDate,wearDates:[wearDate],itemIds:oSel.slice(),notes:oNotes});
+  oSel.forEach(function(id){var it=st.items.find(function(i){return i.id===id});if(it){it.wornCount=(it.wornCount||0)+1;it.lastWorn=wearDate}});
+  oSel=[];oName="";oNotes="";oDate="";save();R();
+};
+window._oWearAgain=function(id){wearAgainId=id;wearAgainDate=td();R()};
+window._oWearAgainCancel=function(){wearAgainId=null;wearAgainDate="";R()};
+window._oWearAgainSave=function(id){
+  var o=st.outfits.find(function(x){return x.id===id});
+  if(!o||!wearAgainDate){wearAgainId=null;R();return}
+  if(!o.wearDates)o.wearDates=[o.date||td()];
+  o.wearDates.push(wearAgainDate);
+  var d=wearAgainDate;
+  o.itemIds.forEach(function(iid){var it=st.items.find(function(x){return x.id===iid});if(it){it.wornCount=(it.wornCount||0)+1;it.lastWorn=d}});
+  wearAgainId=null;wearAgainDate="";save();R();
+};
+window._oToPlan=function(id){
+  var o=st.outfits.find(function(x){return x.id===id});
+  if(!o)return;
+  // Copy outfit to plan tab - pre-fill selections
+  planSel=o.itemIds.slice();
+  planName=o.name;
+  planType=o.type||"casual";
+  var tm=new Date();tm.setDate(tm.getDate()+1);
+  planDate=tm.toISOString().slice(0,10);
+  oView="plan";
+  R();
+};
+window._pTog=function(id){var idx=planSel.indexOf(id);if(idx>=0)planSel.splice(idx,1);else planSel.push(id);R()};
+window._pSave=function(){
+  if(!planSel.length||!planDate)return;
+  if(!st.planned)st.planned=[];
+  st.planned.push({id:"p-"+Date.now(),name:planName||"Plan for "+planDate,type:planType,date:planDate,itemIds:planSel.slice()});
+  planSel=[];planName="";planDate="";save();R();
+};
+window._pDel=function(id){
+  st.planned=st.planned.filter(function(p){return p.id!==id});save();R();
+};
+window._pWear=function(id){
+  var p=st.planned.find(function(x){return x.id===id});
+  if(!p)return;
+  st.outfits.push({id:"o-"+Date.now(),name:p.name,type:p.type,date:p.date,wearDates:[p.date],itemIds:p.itemIds.slice(),notes:""});
+  p.itemIds.forEach(function(iid){var it=st.items.find(function(x){return x.id===iid});if(it){it.wornCount=(it.wornCount||0)+1;it.lastWorn=p.date}});
+  st.planned=st.planned.filter(function(x){return x.id!==id});
+  save();R();
 };
 window._reset=function(){if(!confirm("Reset everything?"))return;st=makeDef();save();R()};
 
