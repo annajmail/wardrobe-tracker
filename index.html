@@ -500,6 +500,7 @@ function rSet(){
   var h='<div class="cd"><h3 style="margin:0 0 10px;font-size:14px">Settings</h3>';
   h+='<p style="font-size:12px;color:#8A7968;margin-bottom:10px">Data saves automatically to this device.</p>';
   h+='<p style="font-size:12px;color:#8A7968;margin-bottom:10px">Log outfits here daily. Chat with Claude to sync updates.</p>';
+  h+='<button class="bt ba" style="margin-bottom:8px;width:100%" onclick="window._exp()">&#x1F4E4; Export My Data</button>';
   h+='<button class="bt" style="background:rgba(196,91,91,0.1);color:#C45B5B;border:1px solid rgba(196,91,91,0.27)" onclick="window._reset()">Reset to Original</button></div>';
   return h;
 }
@@ -612,6 +613,8 @@ window._pWear=function(id){
 };
 window._reset=function(){if(!confirm("Reset everything?"))return;st=makeDef();save();R()};
 
+window._exp=function(){var d=JSON.stringify(st,null,2);var b=new Blob([d],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="wardrobe.json";a.click();};
+  
 R();
 
 })();
